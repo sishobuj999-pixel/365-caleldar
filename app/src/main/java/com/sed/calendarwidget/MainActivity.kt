@@ -146,7 +146,7 @@ function updateHeader(){
   left.textContent=ms>0?parts(ms)+' left':'2026 has ended';
  }else if(shownYear>n.getFullYear()){
   const ms=new Date(shownYear,0,1)-n;
-  left.textContent='WILL COME AFTER\\n'+parts(ms);
+  left.textContent='WILL COME AFTER · '+parts(ms);
  }else{
   left.textContent='PAST YEAR';
  }
