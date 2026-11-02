@@ -2,166 +2,87 @@ package com.sed.calendarwidget
 
 import android.app.Activity
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.view.Gravity
 import android.view.View
-import android.widget.Button
-import android.widget.GridLayout
-import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.TextView
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import android.webkit.WebSettings
+import android.webkit.WebView
 
 class MainActivity : Activity() {
-    private val handler = Handler(Looper.getMainLooper())
-    private lateinit var clock: TextView
-    private lateinit var dateLine: TextView
-    private lateinit var countdown: TextView
-    private lateinit var calendarHost: LinearLayout
-    private var shownMonth = YearMonth.now()
-    private val dark = Color.rgb(23, 25, 35)
-    private val panel = Color.rgb(35, 39, 52)
-    private val accent = Color.rgb(74, 222, 128)
-    private val white = Color.WHITE
-    private val muted = Color.rgb(190, 195, 208)
-
-    private val ticker = object : Runnable {
-        override fun run() {
-            val now = LocalDateTime.now()
-            clock.text = now.format(DateTimeFormatter.ofPattern("HH:mm:ss", Locale.ENGLISH))
-            dateLine.text = now.format(DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy", Locale.ENGLISH))
-            val target = LocalDateTime.of(2027, 1, 1, 0, 0)
-            val d = Duration.between(now, target)
-            countdown.text = if (d.isNegative) "2027 HAS ARRIVED" else
-                "%d DAYS  %02d:%02d:%02d LEFT".format(
-                    d.toDays(), d.toHours().rem(24), d.toMinutes().rem(60), d.seconds.rem(60))
-            handler.postDelayed(this, 1000)
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = dark
-        window.navigationBarColor = dark
-        window.decorView.systemUiVisibility = 0
-        val page = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundColor(dark)
-            setPadding(dp(18), dp(22), dp(18), dp(12))
+        window.statusBarColor = Color.WHITE
+        window.navigationBarColor = Color.WHITE
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        val web = WebView(this).apply {
+            setBackgroundColor(Color.WHITE)
+            settings.javaScriptEnabled = true
+            settings.loadWithOverviewMode = true
+            settings.useWideViewPort = true
+            settings.cacheMode = WebSettings.LOAD_NO_CACHE
+            isVerticalScrollBarEnabled = false
+            isHorizontalScrollBarEnabled = false
+            loadDataWithBaseURL("https://sed.calendar.local/", calendarHtml(), "text/html", "UTF-8", null)
         }
-        val scroll = ScrollView(this)
-        val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        val year = TextView(this).apply {
-            text = "2026"; textSize = 42f; setTextColor(white); typeface = Typeface.DEFAULT_BOLD
-        }
-        clock = TextView(this).apply {
-            textSize = 32f; setTextColor(white); typeface = Typeface.DEFAULT_BOLD
-        }
-        dateLine = TextView(this).apply { textSize = 15f; setTextColor(muted) }
-        countdown = TextView(this).apply {
-            textSize = 16f; setTextColor(accent); typeface = Typeface.DEFAULT_BOLD
-            setPadding(0, dp(12), 0, dp(18))
-        }
-        content.addView(year)
-        content.addView(clock)
-        content.addView(dateLine)
-        content.addView(countdown)
-        val heading = TextView(this).apply {
-            text = "FULL CALENDAR"; textSize = 13f; setTextColor(muted)
-            typeface = Typeface.DEFAULT_BOLD; setPadding(0, dp(8), 0, dp(10))
-        }
-        content.addView(heading)
-        val nav = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
-        }
-        val prev = Button(this).apply { text = "‹"; setOnClickListener { shownMonth = shownMonth.minusMonths(1); renderMonth() } }
-        val next = Button(this).apply { text = "›"; setOnClickListener { shownMonth = shownMonth.plusMonths(1); renderMonth() } }
-        val monthTitle = TextView(this).apply {
-            tag = "monthTitle"; textSize = 20f; setTextColor(white); gravity = Gravity.CENTER
-            typeface = Typeface.DEFAULT_BOLD
-        }
-        nav.addView(prev, LinearLayout.LayoutParams(dp(52), dp(48)))
-        nav.addView(monthTitle, LinearLayout.LayoutParams(0, dp(48), 1f))
-        nav.addView(next, LinearLayout.LayoutParams(dp(52), dp(48)))
-        content.addView(nav)
-        calendarHost = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        content.addView(calendarHost)
-        val todayButton = Button(this).apply {
-            text = "TODAY"; setOnClickListener { shownMonth = YearMonth.now(); renderMonth() }
-        }
-        content.addView(todayButton)
-        scroll.addView(content)
-        page.addView(scroll)
-        setContentView(page)
-        renderMonth()
-        handler.post(ticker)
+        setContentView(web)
     }
 
-    private fun renderMonth() {
-        calendarHost.removeAllViews()
-        val monthLabel = findTextViewByTag(window.decorView, "monthTitle")
-        monthLabel?.text = shownMonth.format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH))
-        val weekdays = GridLayout(this).apply { columnCount = 7 }
-        listOf("S","M","T","W","T","F","S").forEach {
-            val tv = TextView(this).apply {
-                text = it; gravity = Gravity.CENTER; setTextColor(muted); textSize = 13f
-                setPadding(0, dp(10), 0, dp(10))
-            }
-            weekdays.addView(tv, GridLayout.LayoutParams().apply {
-                width = 0; height = dp(38); columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-            })
-        }
-        calendarHost.addView(weekdays)
-        val grid = GridLayout(this).apply { columnCount = 7 }
-        val first = shownMonth.atDay(1)
-        val offset = first.dayOfWeek.value % 7
-        val count = shownMonth.lengthOfMonth()
-        val rows = (offset + count + 6) / 7
-        repeat(rows * 7) { index ->
-            val day = index - offset + 1
-            val valid = day in 1..count
-            val today = valid && shownMonth.atDay(day) == LocalDate.now()
-            val tv = TextView(this).apply {
-                text = if (valid) day.toString() else ""
-                gravity = Gravity.CENTER
-                textSize = 15f
-                setTextColor(if (today) Color.BLACK else white)
-                if (today) { setBackgroundColor(accent); typeface = Typeface.DEFAULT_BOLD }
-                else if (valid) setBackgroundColor(panel)
-            }
-            val lp = GridLayout.LayoutParams().apply {
-                width = 0; height = dp(48)
-                columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                setMargins(dp(2), dp(2), dp(2), dp(2))
-            }
-            grid.addView(tv, lp)
-        }
-        calendarHost.addView(grid)
-    }
-
-    private fun findTextViewByTag(v: View, tagValue: String): TextView? {
-        if (v is TextView && v.tag == tagValue) return v
-        if (v is android.view.ViewGroup) {
-            for (i in 0 until v.childCount) {
-                val found = findTextViewByTag(v.getChildAt(i), tagValue)
-                if (found != null) return found
-            }
-        }
-        return null
-    }
-
-    private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
-
-    override fun onDestroy() {
-        handler.removeCallbacks(ticker)
-        super.onDestroy()
-    }
+    private fun calendarHtml(): String = """
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2026 Calendar</title><meta name="theme-color" content="#ffffff">
+<style>
+:root{--ink:#000;--paper:#fff;--line:#d4d4d4}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#fff}
+body{display:flex;justify-content:center;align-items:center;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink)}
+.sheet{container-type:inline-size;width:min(100vw,calc(100vh*9/16));height:min(177.7778vw,100vh);aspect-ratio:9/16;background:var(--paper);padding:5cqw 3cqw 3cqw;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:flex-end;padding:0 .4cqw 2.4cqw}
+.top h1{font-size:17cqw;font-weight:800;letter-spacing:-.06em;line-height:.8}
+.top p{font-size:2.1cqw;font-weight:500;letter-spacing:.02em;text-align:right;line-height:1.5}
+.wk,.g{display:grid;grid-template-columns:repeat(14,1fr)}
+.wk span{font-size:1.5cqw;font-weight:700;text-align:center;padding:1.2cqw 0;border-top:.5cqw solid var(--ink);border-bottom:1px solid var(--ink)}
+.g{flex:1;min-height:0;grid-template-rows:repeat(27,minmax(0,1fr));border-left:1px solid var(--line)}
+.g div{border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.25cqw}
+.g div:nth-child(-n+14){border-top:0}
+.g b{font-size:2.7cqw;font-weight:800;letter-spacing:-.03em;line-height:1}
+.g i{font-style:normal;font-size:1.3cqw;font-weight:500;color:#555;line-height:1;white-space:nowrap}
+.g .m{background:var(--ink)}.g .m b{color:#fff}.g .m i{color:#bbb}
+.g .e{background:#fff}
+.g .t{background:#16a34a}.g .t b,.g .t i{color:#fff}
+.live{text-align:right;font-variant-numeric:tabular-nums}
+#clk{font-size:5.2cqw;font-weight:800;letter-spacing:-.02em;line-height:1}
+#dt,#left{font-size:1.9cqw;font-weight:500;margin-top:.9cqw}
+</style></head><body><main class="sheet">
+<div class="top"><h1>2026</h1><div class="live"><div id="clk">--:--:--</div><div id="dt"></div><div id="left"></div></div></div>
+<div class="wk"><span>SAT</span><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
+<div class="g" id="grid"></div></main><script>
+const grid=document.getElementById('grid');
+const codes=['JN','FB','MR','AP','MY','JU','JL','AU','SE','OC','NO','DE'];
+const first=new Date(2026,0,1), offset=(first.getDay()+1)%7;
+for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='e';grid.appendChild(e)}
+for(let i=0;i<365;i++){
+ const d=new Date(2026,0,1+i), cell=document.createElement('div');
+ if(d.getDate()===1)cell.className='m';
+ cell.innerHTML='<b>'+(i+1)+'</b><i>'+codes[d.getMonth()]+' '+d.getDate()+'</i>';
+ grid.appendChild(cell);
+}
+while(grid.children.length<378){const e=document.createElement('div');e.className='e';grid.appendChild(e)}
+const cells=[...grid.children].filter(c=>c.querySelector('b'));
+const p=n=>String(n).padStart(2,'0');
+const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let marked=-1;
+function tick(){
+ const n=new Date();
+ document.getElementById('clk').textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+ document.getElementById('dt').textContent=n.getDate()+' '+M[n.getMonth()]+' '+n.getFullYear();
+ const ms=new Date(2027,0,1)-n,L=document.getElementById('left');
+ if(ms>0&&n.getFullYear()===2026){const s=Math.floor(ms/1000);L.textContent=Math.floor(s/86400)+'d '+p(Math.floor(s%86400/3600))+':'+p(Math.floor(s%3600/60))+':'+p(s%60)+' left';
+ const doy=Math.floor((new Date(2026,n.getMonth(),n.getDate())-first)/864e5)+1;
+ if(doy!==marked){cells.forEach(c=>c.classList.remove('t'));if(cells[doy-1])cells[doy-1].classList.add('t');marked=doy;}
+ }else{L.textContent=n.getFullYear()>2026?'2026 has ended':'';cells.forEach(c=>c.classList.remove('t'));}
+}
+tick();setInterval(tick,1000);
+</script></body></html>
+    """.trimIndent()
 }
