@@ -92,8 +92,8 @@ body{display:flex;justify-content:center;align-items:center;font-family:"Helveti
 button{font:inherit;cursor:pointer;color:white}
 .sheet{container-type:inline-size;position:relative;width:min(100vw,calc(100vh*9/16));height:min(177.7778vw,100vh);background:rgba(20,30,49,.30);-webkit-backdrop-filter:blur(32px) saturate(165%);backdrop-filter:blur(32px) saturate(165%);border:1px solid var(--edge);border-radius:5cqw;padding:0;display:flex;flex-direction:column;box-shadow:0 12px 42px rgba(0,0,0,.2);touch-action:pan-y;overflow:hidden}
 .top{display:flex;justify-content:space-between;align-items:flex-end;padding:0 .4cqw 2.4cqw;min-height:19cqw}
-.yearnav{display:flex;align-items:center;gap:1.2cqw}
-.top h1{font-size:17cqw;font-weight:800;letter-spacing:-.06em;line-height:.8}
+.yearnav{display:flex;align-items:center;gap:1.2cqw}.yearnav h1{cursor:ns-resize}
+.top h1{font-size:17cqw;font-weight:800;letter-spacing:-.06em;line-height:.8;touch-action:pan-y;user-select:none}
 .nav,.iconbtn{border:1px solid var(--edge);background:rgba(255,255,255,.10);color:white;border-radius:50%;width:7cqw;height:7cqw;font-size:4cqw;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
 .nav:disabled{opacity:.15}
 .live{text-align:right;font-variant-numeric:tabular-nums;max-width:57%;min-width:0}
@@ -115,7 +115,7 @@ button{font:inherit;cursor:pointer;color:white}
 .g .event{background:rgba(220,38,38,.88)!important}.g .event b,.g .event i{color:#fff}
 .g .event.today{background:rgba(190,35,48,.96)!important}
 .hint{text-align:center;font-size:1.6cqw;color:rgba(255,255,255,.58);padding-top:1.1cqw;letter-spacing:.08em}
-.glass{background:rgba(24,39,63,.38);border:1px solid rgba(255,255,255,.30);box-shadow:0 18px 55px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.12);-webkit-backdrop-filter:blur(30px) saturate(175%);backdrop-filter:blur(30px) saturate(175%)}
+.glass{background:rgba(24,39,63,.46);border:1px solid rgba(255,255,255,.30);box-shadow:0 18px 55px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.12);-webkit-backdrop-filter:blur(18px) saturate(145%);backdrop-filter:blur(18px) saturate(145%)}
 .overlay{position:absolute;inset:0;background:rgba(3,9,20,.22);-webkit-backdrop-filter:blur(14px) saturate(130%);backdrop-filter:blur(14px) saturate(130%);display:flex;align-items:center;justify-content:center;padding:6cqw;z-index:5;opacity:0;visibility:hidden;transition:opacity .24s ease,visibility .24s ease}
 .overlay.show{opacity:1;visibility:visible}
 .modal{width:100%;max-width:440px;border-radius:5cqw;padding:5cqw;transform:translateY(14px) scale(.96);transition:transform .28s cubic-bezier(.2,.8,.2,1);max-height:88%;overflow:auto}
@@ -195,15 +195,18 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <button class="tile" data-page="notesPage"><span>▤</span>Notes</button>
 <button class="tile" data-page="settingsPage"><span>⚙</span>Settings</button>
 <button class="tile" data-page="aboutPage"><span>ⓘ</span>About</button>
+<button class="tile" data-page="calculatorPage"><span>🧮</span>Date calculator</button>
 </div><p class="emptyState">Swipe down to return to calendar</p></div>
 <div id="eventsPage" class="page"><div class="pageTitle">All events</div><div id="eventsList"></div></div>
 <div id="notesPage" class="page"><div class="pageTitle">Notebook</div><div id="noteEditor" class="noteEditor glass"><input id="noteTitle" placeholder="Note title"><textarea id="noteBody" placeholder="Write your note..."></textarea><button class="primary" id="saveNote">Save note</button><button class="secondary" id="cancelNote">Cancel</button></div><div id="notesList"></div><button class="pen" id="newNote" aria-label="New note">✎</button></div>
 <div id="settingsPage" class="page"><div class="pageTitle">Settings</div><div class="settingrow"><span>24-hour clock</span><input type="checkbox" id="format24"></div><div class="settingrow"><span>Glass intensity</span><input type="range" id="glassLevel" min="10" max="42" value="30"></div><p class="emptyState">Settings are saved on this device.</p></div>
-<div id="aboutPage" class="page"><div class="pageTitle">SED Calendar</div><div class="item"><strong>SED Calendar 2026–2040</strong><p>Calendar, recurring events, alarms and private notebook.</p></div></div>
+<div id="aboutPage" class="page"><div class="pageTitle">SED Calendar</div><div class="item"><strong>SED Calendar 1900–2100</strong><p>Calendar, recurring events, alarms and private notebook.</p></div></div>
+<div id="calculatorPage" class="page"><div class="pageTitle">Date calculator</div><div class="item"><label for="calcStart">From date</label><input id="calcStart" type="date"><label for="calcEnd" style="margin-top:2.5cqw">To date</label><input id="calcEnd" type="date"><button class="primary" id="calculateDates" style="width:100%">Calculate duration</button></div><div id="calcResult" class="item" aria-live="polite"><strong>Select two dates</strong><p>See the exact calendar difference in years, months and days.</p></div></div>
 </section></main>
 <script>
 const grid=document.getElementById('grid'),yearEl=document.getElementById('year');
 const codes=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const MIN_YEAR=1900,MAX_YEAR=2100;
 const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const p=n=>String(n).padStart(2,'0');
 let shownYear=2026,selectedDate=null,events={},notes=[],editingNoteId=null;
@@ -222,7 +225,7 @@ function eventApplies(base,record,target){
 }
 function eventsForDate(date){const found=[];Object.keys(events).forEach(k=>{const rec=normalizeEvent(events[k]);const a=k.split('-').map(Number);const base=new Date(a[0],a[1]-1,a[2]);if(rec&&rec.description&&eventApplies(base,rec,date))found.push({key:k,record:rec});});return found;}
 function renderYear(direction){
- yearEl.textContent=shownYear;document.getElementById('prev').disabled=shownYear<=2026;document.getElementById('next').disabled=shownYear>=2040;
+ yearEl.textContent=shownYear;document.getElementById('prev').disabled=shownYear<=1900;document.getElementById('next').disabled=shownYear>=2100;
  grid.classList.remove('year-next','year-prev');void grid.offsetWidth;grid.classList.add(direction==='next'?'year-next':'year-prev');grid.innerHTML='';
  const first=new Date(shownYear,0,1),offset=(first.getDay()+1)%7,total=(new Date(shownYear+1,0,1)-first)/86400000;
  for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='empty';grid.appendChild(e);}
@@ -248,7 +251,11 @@ function updateHeader(){
  else if(shownYear>n.getFullYear()){left.textContent='COUNTDOWN · '+parts(new Date(shownYear,0,1)-n);}
  else left.textContent='PAST YEAR';
 }
-function changeYear(delta){const next=shownYear+delta;if(next<2026||next>2040)return;shownYear=next;renderYear(delta>0?'next':'prev');}
+function changeYear(delta){const next=shownYear+delta;if(next<MIN_YEAR||next>MAX_YEAR)return;shownYear=next;renderYear(delta>0?'next':'prev');}
+let yearTouchY=null,yearWheelLock=0;
+yearEl.addEventListener('touchstart',e=>{e.stopPropagation();yearTouchY=e.touches[0].clientY;},{passive:true});
+yearEl.addEventListener('touchend',e=>{e.stopPropagation();if(yearTouchY===null)return;const dy=e.changedTouches[0].clientY-yearTouchY;yearTouchY=null;if(Math.abs(dy)>12)changeYear(dy<0?1:-1);},{passive:true});
+yearEl.addEventListener('wheel',e=>{e.preventDefault();if(yearWheelLock)return;yearWheelLock=1;changeYear(e.deltaY>0?1:-1);setTimeout(()=>yearWheelLock=0,100);},{passive:false});
 document.getElementById('prev').addEventListener('click',()=>changeYear(-1));document.getElementById('next').addEventListener('click',()=>changeYear(1));
 grid.addEventListener('click',e=>{const cell=e.target.closest('.day');if(!cell)return;const a=cell.dataset.date.split('-').map(Number);openDate(new Date(a[0],a[1]-1,a[2]));});
 function openDate(d){
@@ -286,7 +293,7 @@ function closeModal(){document.getElementById('overlay').classList.remove('show'
 document.getElementById('close').addEventListener('click',closeModal);document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
 function showHub(page){document.getElementById('hub').classList.add('show');showPage(page||'homePage');}
 function hideHub(){document.getElementById('hub').classList.remove('show');}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.getElementById('hubTitle').textContent=({homePage:'Calendar tools',eventsPage:'Events',notesPage:'Notebook',settingsPage:'Settings',aboutPage:'About'})[id]||'Calendar tools';if(id==='eventsPage')renderEvents();if(id==='notesPage')renderNotes();}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.getElementById('hubTitle').textContent=({homePage:'Calendar tools',eventsPage:'Events',notesPage:'Notebook',settingsPage:'Settings',aboutPage:'About',calculatorPage:'Date calculator'})[id]||'Calendar tools';if(id==='eventsPage')renderEvents();if(id==='notesPage')renderNotes();if(id==='calculatorPage')initDateCalculator();}
 document.querySelectorAll('.tile').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 document.getElementById('hubBack').addEventListener('click',()=>{if(!document.getElementById('homePage').classList.contains('active'))showPage('homePage');else hideHub();});
 function renderEvents(){
@@ -294,6 +301,10 @@ function renderEvents(){
  if(!keys.length){list.innerHTML='<div class="emptyState">No saved events yet.</div>';return;}
  keys.forEach(k=>{const rec=normalizeEvent(events[k]);if(!rec||!rec.description)return;const a=k.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2]),el=document.createElement('button');el.className='item';el.style.width='100%';el.style.textAlign='left';el.innerHTML='<strong></strong><small></small><p></p>';el.querySelector('strong').textContent=rec.description;el.querySelector('small').textContent=d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+' · '+scopeName(rec.scope);el.querySelector('p').textContent='Tap to open date';el.addEventListener('click',()=>{hideHub();openDate(d);});list.appendChild(el);});
 }
+function initDateCalculator(){const a=document.getElementById('calcStart'),b=document.getElementById('calcEnd');if(!a.value||!b.value){const t=new Date(),v=t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate());if(!a.value)a.value=v;if(!b.value)b.value=v;}}
+function parseLocalDate(value){if(!value)return null;const a=value.split('-').map(Number);return new Date(a[0],a[1]-1,a[2]);}
+function calendarDifference(a,b){let start=a<=b?new Date(a):new Date(b),end=a<=b?new Date(b):new Date(a);let years=end.getFullYear()-start.getFullYear(),anchor=new Date(start);anchor.setFullYear(start.getFullYear()+years);if(anchor>end){years--;anchor=new Date(start);anchor.setFullYear(start.getFullYear()+years);}let months=(end.getFullYear()-anchor.getFullYear())*12+end.getMonth()-anchor.getMonth(),monthAnchor=new Date(anchor);monthAnchor.setDate(1);monthAnchor.setMonth(monthAnchor.getMonth()+months);monthAnchor.setDate(Math.min(anchor.getDate(),new Date(monthAnchor.getFullYear(),monthAnchor.getMonth()+1,0).getDate()));if(monthAnchor>end){months--;monthAnchor=new Date(anchor);monthAnchor.setDate(1);monthAnchor.setMonth(monthAnchor.getMonth()+months);monthAnchor.setDate(Math.min(anchor.getDate(),new Date(monthAnchor.getFullYear(),monthAnchor.getMonth()+1,0).getDate()));}return {years,months,days:Math.round((end-monthAnchor)/86400000),forward:a<=b};}
+document.getElementById('calculateDates').addEventListener('click',()=>{const a=parseLocalDate(document.getElementById('calcStart').value),b=parseLocalDate(document.getElementById('calcEnd').value),out=document.getElementById('calcResult');if(!a||!b){out.innerHTML='<strong>Choose both dates</strong><p>Please select a start date and an end date.</p>';return;}const d=calendarDifference(a,b),from=a.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),to=b.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});out.innerHTML='<strong>'+(d.forward?'Time elapsed / remaining':'Date difference')+'</strong><p>'+from+' → '+to+'</p><div class="durationBreakdown"><div class="durationStat"><strong>'+d.years+'</strong><span>Years</span></div><div class="durationStat"><strong>'+d.months+'</strong><span>Months</span></div><div class="durationStat"><strong>'+d.days+'</strong><span>Days</span></div></div>';});
 function scopeName(s){return ({'month-year':'This month in this year','all-months-year':'Every month in this year','month-all-years':'This month in every year','all-months-all-years':'Every month in every year'})[s]||'One date';}
 function persistNotes(){localStorage.setItem('sedCalendarNotes',JSON.stringify(notes));}
 function renderNotes(){
@@ -320,13 +331,12 @@ function paintHub(progress){
  hubProgress=clamp(progress,0,1);
  hub.classList.add('dragging');sheet.classList.add('dragging');
  hub.style.transform='translate3d(0,'+((1-hubProgress)*100)+'%,0)';
- document.getElementById('calendarLayer').style.filter='blur('+(hubProgress*26).toFixed(2)+'px) saturate('+(1+hubProgress*.14)+')';
 }
 function settleHub(open){
  hubProgress=open?1:0;
  hub.classList.remove('dragging');sheet.classList.remove('dragging');
  hub.style.transform='';
- document.getElementById('calendarLayer').style.filter=open?'blur(26px) saturate(1.14)':'';
+ document.getElementById('calendarLayer').style.filter=open?'blur(18px) saturate(1.08)':'';
  if(open){hub.classList.add('show');}
  else{hub.classList.remove('show');}
 }
