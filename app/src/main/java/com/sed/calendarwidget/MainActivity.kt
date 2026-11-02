@@ -321,13 +321,13 @@ function renderHistory(){
  const list=document.getElementById('historyList'),summary=document.getElementById('historySummary');
  if(!historyState.data){list.innerHTML='<div class="emptyState">No historical records loaded.</div>';return;}
  const all=historyKinds.reduce((n,k)=>n+(Array.isArray(historyState.data[k])?historyState.data[k].length:0),0),records=historyRecords(),shown=records.slice(0,historyState.visible);
- summary.textContent=all.toLocaleString()+' records available · '+(historyState.kind==='all'?'All categories':historyLabel(historyState.kind))+' · Repeated entries are kept as supplied by the source.';
+ summary.textContent=all.toLocaleString()+' records · '+(historyState.kind==='all'?'All categories':historyLabel(historyState.kind))+' · '+(historyState.status||'Offline archive');
  list.innerHTML='';
  if(!records.length){list.innerHTML='<div class="emptyState">No records were returned for this category and date.</div>';return;}
  shown.forEach(item=>{
   const r=item.record||{},card=document.createElement('article');card.className='historyCard';
   const meta=document.createElement('div');meta.className='historyMeta';meta.textContent=historyLabel(item.kind)+(r.year?' · '+r.year:'');
-  const pages=Array.isArray(r.pages)?r.pages:[],title=document.createElement('strong');title.textContent=pages[0]&&pages[0].title?pages[0].title.replace(/_/g,' '):'Historical record';
+  const pages=Array.isArray(r.pages)?r.pages:[],title=document.createElement('strong');title.textContent=(r.title||(pages[0]&&pages[0].title)||'Historical record').replace(/_/g,' ');
   const body=document.createElement('p');body.textContent=r.text||r.description||r.title||'No additional description is available in this record.';
   card.appendChild(meta);card.appendChild(title);card.appendChild(body);
   if(pages.length){const related=document.createElement('div');related.className='historyPages';related.textContent='Related pages: '+pages.map(x=>(x.title||'').replace(/_/g,' ')).filter(Boolean).join(' · ');card.appendChild(related);}
@@ -335,15 +335,56 @@ function renderHistory(){
  });
  if(records.length>shown.length){const more=document.createElement('button');more.className='historyMore';more.textContent='Show more ('+(records.length-shown.length).toLocaleString()+' remaining)';more.addEventListener('click',()=>{historyState.visible+=50;renderHistory();});list.appendChild(more);}
 }
+function mergeHistoryData(base,extra){
+ const merged={events:[],births:[],deaths:[],holidays:[],selected:[]};
+ historyKinds.forEach(kind=>{
+  const rows=[...(Array.isArray(base&&base[kind])?base[kind]:[]),...(Array.isArray(extra&&extra[kind])?extra[kind]:[])],seen=new Set();
+  rows.forEach(r=>{
+   if(!r)return;
+   const key=[r.year||'',(r.title||''),(r.text||r.description||'')].join('|').toLowerCase();
+   if(seen.has(key))return;seen.add(key);merged[kind].push(r);
+  });
+ });
+ return merged;
+}
 function loadDateHistory(d){
- const list=document.getElementById('historyList'),summary=document.getElementById('historySummary'),key=historyDateKey(d);
+ const summary=document.getElementById('historySummary'),key=historyDateKey(d),cacheKey=historyCacheKey(d);
  historyState.kind='all';historyState.visible=50;
  document.querySelectorAll('.historyFilter').forEach(b=>b.classList.toggle('active',b.dataset.kind==='all'));
  document.getElementById('historyDate').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
- historyState.data=BUILTIN_HISTORY[key]||{events:[],births:[],deaths:[],holidays:[],selected:[]};
- const count=historyKinds.reduce((n,k)=>n+historyState.data[k].length,0);
- summary.textContent=count.toLocaleString()+' offline records in this date · Built into the app';
+ let cached={events:[],births:[],deaths:[],holidays:[],selected:[]};
+ try{cached=JSON.parse(localStorage.getItem(cacheKey)||'null')||cached;}catch(_){}
+ historyState.data=mergeHistoryData(BUILTIN_HISTORY[key]||{},cached);
+ historyState.status=navigator.onLine?'Offline archive · checking online…':'Offline archive · no internet connection';
  renderHistory();
+ if(!navigator.onLine)return;
+ const month=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+ fetch('https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/'+month+'/'+day,{signal:controller.signal,headers:{'Accept':'application/json'}})
+  .then(response=>{if(!response.ok)throw new Error('HTTP '+response.status);return response.json();})
+  .then(payload=>{
+   const online={events:[],births:[],deaths:[],holidays:[],selected:[]};
+   historyKinds.forEach(kind=>{
+    (Array.isArray(payload[kind])?payload[kind]:[]).forEach(item=>{
+     const pages=Array.isArray(item.pages)?item.pages:[];
+     online[kind].push({year:item.year||'',title:(pages[0]&&pages[0].title)||item.text||'Historical record',text:item.text||'',pages:pages.map(p=>({title:p.title||''}))});
+    });
+   });
+   const saved=mergeHistoryData(cached,online);
+   localStorage.setItem(cacheKey,JSON.stringify(saved));
+   if(document.getElementById('historyOverlay').classList.contains('show')&&document.getElementById('historyDate').textContent===d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})){
+    historyState.data=mergeHistoryData(BUILTIN_HISTORY[key]||{},saved);
+    historyState.status='Offline archive + online history · saved on device';
+    renderHistory();
+   }
+  })
+  .catch(()=>{
+   if(document.getElementById('historyOverlay').classList.contains('show')){
+    historyState.status=cached&&historyKinds.some(k=>(cached[k]||[]).length)?'Offline archive + saved online cache · connection unavailable':'Offline archive · online source unavailable';
+    renderHistory();
+   }
+  })
+  .finally(()=>clearTimeout(timer));
 }
 document.getElementById('historyOpen').addEventListener('click',()=>{if(!selectedDate)return;document.getElementById('historyOverlay').classList.add('show');loadDateHistory(selectedDate,false);});
 document.getElementById('historyClose').addEventListener('click',()=>document.getElementById('historyOverlay').classList.remove('show'));
