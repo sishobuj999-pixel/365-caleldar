@@ -27,8 +27,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view v1.0.0 --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            gh release upload v1.0.0 ./apk/app-debug.apk --repo "${{ github.repository }}" --clobber
+          if gh release view v1.1.0 --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload v1.1.0 ./apk/app-debug.apk --repo "${{ github.repository }}" --clobber
           else
-            gh release create v1.0.0 ./apk/app-debug.apk --repo "${{ github.repository }}" --title "SED Calendar 2026" --notes "Direct APK download for SED Calendar 2026."
+            gh release create v1.1.0 ./apk/app-debug.apk --repo "${{ github.repository }}" --title "SED Calendar 2026 v1.1.0" --notes "Direct APK download for SED Calendar 2026 v1.1.0."
           fi
