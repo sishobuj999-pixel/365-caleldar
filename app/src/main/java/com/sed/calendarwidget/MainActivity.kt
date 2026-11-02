@@ -234,7 +234,7 @@ function calendarDuration(a,b,cal=activeCalendar){
  const start=a<=b?new Date(a):new Date(b),end=a<=b?new Date(b):new Date(a),s=calendarParts(start,cal),e=calendarParts(end,cal);
  let totalMonths=(e.year-s.year)*12+(e.month-s.month);
  if(totalMonths<0)totalMonths=0;
- function monthDate(count){const index=s.month-1+count,y=s.year+Math.floor(index/12),m=(index%12)+1;return dateForCalendarParts(y,m,s.day,cal);}
+ function monthDate(count){const index=s.month-1+count,y=s.year+Math.floor(index/12),m=(index%12)+1;let max=30;if(cal==='gregorian')max=new Date(y,m,0).getDate();else if(cal==='bangla')max=banglaMonthLengths(y)[m-1];else if(!dateForCalendarParts(y,m,30,'hijri'))max=29;return dateForCalendarParts(y,m,Math.min(s.day,max),cal);}
  let anchor=monthDate(totalMonths);
  while((!anchor||anchor>end)&&totalMonths>0){totalMonths--;anchor=monthDate(totalMonths);}
  if(!anchor)anchor=start;
@@ -275,7 +275,7 @@ function updateHeader(){
  left.textContent=shownYear===q.year?(remain+' days left in '+CALENDAR_NAMES[activeCalendar]+' year'):shownYear>q.year?('COUNTDOWN · '+Math.max(0,Math.ceil((start-today)/86400000))+' days'):'PAST '+CALENDAR_NAMES[activeCalendar].toUpperCase()+' YEAR';
 }
 function changeYear(delta){const range=calendarYearRange(),next=shownYear+delta;if(next<range.min||next>range.max)return;shownYear=next;renderYear(delta>0?'next':'prev');}
-function switchCalendar(){const i=CALENDARS.indexOf(activeCalendar);activeCalendar=CALENDARS[(i+1)%CALENDARS.length];shownYear=calendarParts(new Date(),activeCalendar).year;renderYear('next');updateDateCountdown();}
+function switchCalendar(){const i=CALENDARS.indexOf(activeCalendar);activeCalendar=CALENDARS[(i+1)%CALENDARS.length];shownYear=calendarParts(new Date(),activeCalendar).year;const ca=document.getElementById('calcStart'),cb=document.getElementById('calcEnd');if(ca)ca.value='';if(cb)cb.value='';renderYear('next');updateDateCountdown();}
 let calendarSwipeX=null,skipCalendarClick=false;const calendarTypeButton=document.getElementById('calendarType');
 calendarTypeButton.addEventListener('click',()=>{if(skipCalendarClick){skipCalendarClick=false;return;}switchCalendar();});
 calendarTypeButton.addEventListener('touchstart',e=>{calendarSwipeX=e.touches[0].clientX;},{passive:true});
