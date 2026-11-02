@@ -92,7 +92,7 @@ body{display:flex;justify-content:center;align-items:center;font-family:"Helveti
 button{font:inherit;cursor:pointer;color:white}
 .sheet{container-type:inline-size;position:relative;width:min(100vw,calc(100vh*9/16));height:min(177.7778vw,100vh);background:rgba(20,30,49,.30);-webkit-backdrop-filter:blur(32px) saturate(165%);backdrop-filter:blur(32px) saturate(165%);border:1px solid var(--edge);border-radius:5cqw;padding:0;display:flex;flex-direction:column;box-shadow:0 12px 42px rgba(0,0,0,.2);touch-action:pan-y;overflow:hidden}
 .top{display:flex;justify-content:space-between;align-items:flex-end;padding:0 .4cqw 2.4cqw;min-height:19cqw}
-.yearnav{display:flex;align-items:center;gap:1.2cqw}.yearnav h1{cursor:ns-resize}
+.yearnav{display:flex;align-items:center;gap:1.2cqw;min-width:0}.yearnav h1{cursor:ns-resize}.calendarSwitch{border:1px solid var(--edge);background:rgba(255,255,255,.12);border-radius:99px;padding:1.5cqw 2.2cqw;font-size:2.4cqw;font-weight:700;white-space:nowrap;color:#fff;max-width:25cqw}
 .top h1{font-size:17cqw;font-weight:800;letter-spacing:-.06em;line-height:.8;touch-action:pan-y;user-select:none}
 .nav,.iconbtn{border:1px solid var(--edge);background:rgba(255,255,255,.10);color:white;border-radius:50%;width:7cqw;height:7cqw;font-size:4cqw;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
 .nav:disabled{opacity:.15}
@@ -122,7 +122,7 @@ button{font:inherit;cursor:pointer;color:white}
 .modal{width:100%;max-width:440px;border-radius:5cqw;padding:5cqw;transform:translateY(14px) scale(.96);transition:transform .28s cubic-bezier(.2,.8,.2,1);max-height:88%;overflow:auto}
 .overlay.show .modal{transform:translateY(0) scale(1)}
 .modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:3cqw}
-.modal h2{font-size:5cqw;font-weight:800}
+.modal h2{font-size:5cqw;font-weight:800;letter-spacing:-.025em}.modal,.historyPanel{font-family:"Noto Sans Bengali","Noto Sans",system-ui,-apple-system,sans-serif}.datebig{line-height:1.55;white-space:pre-line}.modalhead{padding-bottom:2cqw;border-bottom:1px solid rgba(255,255,255,.14)}
 .close{border:1px solid var(--edge);background:rgba(255,255,255,.12);color:white;border-radius:50%;width:8cqw;height:8cqw;font-size:5cqw}
 .datebig{font-size:3.2cqw;color:rgba(255,255,255,.76);margin-bottom:3cqw}
 .countlabel{font-size:2.3cqw;color:#a9c9ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.2cqw}
@@ -172,7 +172,7 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 .settingrow input{width:5cqw;height:5cqw}
 @media(prefers-reduced-transparency:reduce){.sheet,.modal,#hub{background:rgba(20,30,49,.96)}}
 </style></head><body><main class="sheet" id="sheet">
-<div id="calendarLayer"><div class="top"><div class="yearnav"><button class="nav" id="prev" aria-label="Previous year">‹</button><h1 id="year">2026</h1><button class="nav" id="next" aria-label="Next year">›</button></div><div class="live"><div id="clk">--:--:--</div><div id="dt"></div><div id="left"></div></div></div>
+<div id="calendarLayer"><div class="top"><div class="yearnav"><button class="nav" id="prev" aria-label="Previous year">‹</button><h1 id="year">2026</h1><button class="calendarSwitch" id="calendarType">Gregorian ▾</button><button class="nav" id="next" aria-label="Next year">›</button></div><div class="live"><div id="clk">--:--:--</div><div id="dt"></div><div id="left"></div></div></div>
 <div class="wk"><span>SAT</span><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
 <div class="g" id="grid"></div><div class="hint">SWIPE LEFT / RIGHT · SWIPE UP FOR MORE</div></div>
 <div class="overlay" id="overlay"><section class="modal glass">
@@ -209,11 +209,29 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 const grid=document.getElementById('grid'),yearEl=document.getElementById('year');
 const codes=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const MIN_YEAR=1900,MAX_YEAR=2100;
+const CALENDARS=["gregorian","hijri","bangla"];const CALENDAR_NAMES={gregorian:"Gregorian",hijri:"Hijri",bangla:"Bangla"};const BMONTHS=["Boishakh","Joishtho","Ashar","Srabon","Bhadro","Ashwin","Kartik","Agrahayan","Poush","Magh","Falgun","Chaitra"];const HMONTHS=["Muharram","Safar","Rabi al-Awwal","Rabi al-Thani","Jumada al-Awwal","Jumada al-Thani","Rajab","Shaban","Ramadan","Shawwal","Dhul Qadah","Dhul Hijjah"];let activeCalendar="gregorian";const hijriFmt=new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn",{year:"numeric",month:"numeric",day:"numeric"});
 const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const p=n=>String(n).padStart(2,'0');
-let shownYear=2026,selectedDate=null,events={},notes=[],editingNoteId=null;
+let shownYear=new Date().getFullYear(),selectedDate=null,events={},notes=[],editingNoteId=null;
 try{events=JSON.parse(localStorage.getItem('sedCalendarEvents')||'{}')||{};}catch(e){events={};}
 try{notes=JSON.parse(localStorage.getItem('sedCalendarNotes')||'[]')||[];}catch(e){notes=[];}
+
+function calendarParts(d,cal=activeCalendar){
+ if(cal==='gregorian')return {year:d.getFullYear(),month:d.getMonth()+1,day:d.getDate(),monthName:months[d.getMonth()]};
+ if(cal==='hijri'){const parts=hijriFmt.formatToParts(d),v={};parts.forEach(x=>{if(x.type==='year'||x.type==='month'||x.type==='day')v[x.type]=parseInt(x.value,10);});return {year:v.year,month:v.month,day:v.day,monthName:HMONTHS[v.month-1]};}
+ const start=new Date(d.getFullYear(),3,14);let by=d.getFullYear()-593;if(d<start)by--;
+ const ys=new Date(by+593,3,14),offset=Math.floor((d-ys)/86400000),lens=banglaMonthLengths(by);let rem=offset,m=0;while(m<11&&rem>=lens[m]){rem-=lens[m];m++;}return {year:by,month:m+1,day:rem+1,monthName:BMONTHS[m]};
+}
+function banglaMonthLengths(by){const gy=by+593,leap=(gy%4===0&&(gy%100!==0||gy%400===0));return [31,31,31,31,31,31,30,30,30,30,leap?30:29,30];}
+function dateForCalendarParts(y,m,day,cal=activeCalendar){
+ if(cal==='gregorian'){const d=new Date(y,m-1,day);return d.getFullYear()===y&&d.getMonth()===m-1&&d.getDate()===day?d:null;}
+ if(cal==='bangla'){const lens=banglaMonthLengths(y);if(m<1||m>12||day<1||day>lens[m-1])return null;const d=new Date(y+593,3,14);let off=day-1;for(let i=0;i<m-1;i++)off+=lens[i];d.setDate(d.getDate()+off);return d;}
+ const estimate=Math.floor(622+(y-1)*354.367/365.2425),from=new Date(estimate-1,0,1),to=new Date(estimate+2,0,1);for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){const q=calendarParts(d,'hijri');if(q.year===y&&q.month===m&&q.day===day)return new Date(d);}return null;
+}
+function calendarYearStart(y,cal=activeCalendar){if(cal==='gregorian')return new Date(y,0,1);if(cal==='bangla')return new Date(y+593,3,14);return dateForCalendarParts(y,1,1,'hijri')||new Date(Math.floor(622+(y-1)*354.367/365.2425),0,1);}
+function calendarYearRange(cal=activeCalendar){const n=calendarParts(new Date(),cal).year;return cal==='gregorian'?{min:1900,max:2100}:{min:n-120,max:n+120};}
+function calendarMonthShort(q,cal=activeCalendar){return cal==='gregorian'?codes[q.month-1]:cal==='bangla'?BMONTHS[q.month-1].slice(0,3).toUpperCase():HMONTHS[q.month-1].slice(0,3).toUpperCase();}
+
 function keyFor(d){return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
 function normalizeEvent(v){return typeof v==='string'?{description:v,scope:'month-year'}:v;}
 function parts(ms){const sec=Math.max(0,Math.floor(Math.abs(ms)/1000)),days=Math.floor(sec/86400),hours=Math.floor(sec%86400/3600),mins=Math.floor(sec%3600/60),secs=sec%60;return days+'d  '+p(hours)+'h  '+p(mins)+'m  '+p(secs)+'s';}
@@ -226,34 +244,27 @@ function eventApplies(base,record,target){
  return keyFor(base)===keyFor(target);
 }
 function eventsForDate(date){const found=[];Object.keys(events).forEach(k=>{const rec=normalizeEvent(events[k]);const a=k.split('-').map(Number);const base=new Date(a[0],a[1]-1,a[2]);if(rec&&rec.description&&eventApplies(base,rec,date))found.push({key:k,record:rec});});return found;}
+
 function renderYear(direction){
- yearEl.textContent=shownYear;document.getElementById('prev').disabled=shownYear<=1900;document.getElementById('next').disabled=shownYear>=2100;
+ const range=calendarYearRange();yearEl.textContent=shownYear;document.getElementById('calendarType').textContent=CALENDAR_NAMES[activeCalendar]+' ▾';document.getElementById('prev').disabled=shownYear<=range.min;document.getElementById('next').disabled=shownYear>=range.max;
  grid.classList.remove('year-next','year-prev');void grid.offsetWidth;grid.classList.add(direction==='next'?'year-next':'year-prev');grid.innerHTML='';
- const first=new Date(shownYear,0,1),offset=(first.getDay()+1)%7,total=(new Date(shownYear+1,0,1)-first)/86400000;
+ const first=calendarYearStart(shownYear),next=calendarYearStart(shownYear+1),offset=(first.getDay()+1)%7,total=Math.round((next-first)/86400000);
  for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='empty';grid.appendChild(e);}
  const today=new Date(),todayKey=keyFor(today);
- for(let i=0;i<total;i++){
-  const d=new Date(shownYear,0,1+i),k=keyFor(d),cell=document.createElement('div');
-  cell.className='day'+(d.getDate()===1?' month':'');
-  if(k===todayKey)cell.classList.add('today');
-  const matching=eventsForDate(d);if(matching.length)cell.classList.add('event');
-  cell.dataset.date=k;cell.innerHTML='<b>'+(i+1)+'</b><i>'+codes[d.getMonth()]+' '+d.getDate()+'</i>';
-  if(matching.length)cell.title=matching.map(x=>x.record.description).join(' · ');
-  grid.appendChild(cell);
- }
- while(grid.children.length<378){const e=document.createElement('div');e.className='empty';grid.appendChild(e);}
- updateHeader();
+ for(let i=0;i<total;i++){const d=new Date(first);d.setDate(first.getDate()+i);const q=calendarParts(d),k=keyFor(d),cell=document.createElement('div');cell.className='day'+(q.day===1?' month':'');if(k===todayKey)cell.classList.add('today');const matching=eventsForDate(d);if(matching.length)cell.classList.add('event');cell.dataset.date=k;cell.innerHTML='<b>'+q.day+'</b><i>'+calendarMonthShort(q)+' '+q.month+'</i>';if(matching.length)cell.title=matching.map(x=>x.record.description).join(' · ');grid.appendChild(cell);}
+ while(grid.children.length<378){const e=document.createElement('div');e.className='empty';grid.appendChild(e);}updateHeader();
 }
+
 function updateHeader(){
- const n=new Date(),clock=document.getElementById('clk'),use24=localStorage.getItem('sedCalendar24')==='true';
+ const n=new Date(),clock=document.getElementById('clk'),use24=localStorage.getItem('sedCalendar24')==='true',q=calendarParts(n);
  clock.textContent=use24?p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds()):n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
- document.getElementById('dt').textContent=n.getDate()+' '+months[n.getMonth()].slice(0,3)+' '+n.getFullYear();
- const left=document.getElementById('left');
- if(shownYear===2026){const ms=new Date(2027,0,1)-n;left.textContent=ms>0?parts(ms)+' left':'2026 has ended';}
- else if(shownYear>n.getFullYear()){left.textContent='COUNTDOWN · '+parts(new Date(shownYear,0,1)-n);}
- else left.textContent='PAST YEAR';
+ document.getElementById('dt').textContent=q.day+' '+q.monthName+' '+q.year+' · '+n.getDate()+' '+months[n.getMonth()].slice(0,3)+' '+n.getFullYear();
+ const left=document.getElementById('left'),start=calendarYearStart(shownYear),end=calendarYearStart(shownYear+1),today=new Date(n.getFullYear(),n.getMonth(),n.getDate()),remain=Math.max(0,Math.ceil((end-today)/86400000));
+ left.textContent=shownYear===q.year?(remain+' days left in '+CALENDAR_NAMES[activeCalendar]+' year'):shownYear>q.year?('COUNTDOWN · '+Math.max(0,Math.ceil((start-today)/86400000))+' days'):'PAST '+CALENDAR_NAMES[activeCalendar].toUpperCase()+' YEAR';
 }
-function changeYear(delta){const next=shownYear+delta;if(next<MIN_YEAR||next>MAX_YEAR)return;shownYear=next;renderYear(delta>0?'next':'prev');}
+function changeYear(delta){const range=calendarYearRange(),next=shownYear+delta;if(next<range.min||next>range.max)return;shownYear=next;renderYear(delta>0?'next':'prev');}
+function switchCalendar(){const i=CALENDARS.indexOf(activeCalendar);activeCalendar=CALENDARS[(i+1)%CALENDARS.length];shownYear=calendarParts(new Date(),activeCalendar).year;renderYear('next');updateDateCountdown();}
+document.getElementById('calendarType').addEventListener('click',switchCalendar);
 let yearTouchY=null,yearWheelLock=0;
 yearEl.addEventListener('touchstart',e=>{e.stopPropagation();yearTouchY=e.touches[0].clientY;},{passive:true});
 yearEl.addEventListener('touchend',e=>{e.stopPropagation();if(yearTouchY===null)return;const dy=e.changedTouches[0].clientY-yearTouchY;yearTouchY=null;if(Math.abs(dy)>12)changeYear(dy<0?1:-1);},{passive:true});
