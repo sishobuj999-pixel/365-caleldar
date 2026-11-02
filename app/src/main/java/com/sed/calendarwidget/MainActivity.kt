@@ -270,7 +270,7 @@ function renderYear(direction){
  const first=calendarYearStart(shownYear),next=calendarYearStart(shownYear+1),offset=(first.getDay()+1)%7,total=Math.round((next-first)/86400000);
  for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='empty';grid.appendChild(e);}
  const today=new Date(),todayKey=keyFor(today);
- for(let i=0;i<total;i++){const d=new Date(first);d.setDate(first.getDate()+i);const q=calendarParts(d),k=keyFor(d),cell=document.createElement('div');cell.className='day'+(q.day===1?' month':'');if(k===todayKey)cell.classList.add('today');const matching=eventsForDate(d);if(matching.length)cell.classList.add('event');cell.dataset.date=k;cell.innerHTML='<b>'+q.day+'</b><i>'+calendarMonthShort(q)+' '+q.month+'</i>';if(matching.length)cell.title=matching.map(x=>x.record.description).join(' · ');grid.appendChild(cell);}
+ for(let i=0;i<total;i++){const d=new Date(first);d.setDate(first.getDate()+i);const q=calendarParts(d),k=keyFor(d),cell=document.createElement('div');cell.className='day'+(q.day===1?' month':'');if(k===todayKey)cell.classList.add('today');const matching=eventsForDate(d);if(matching.length)cell.classList.add('event');cell.dataset.date=k;cell.innerHTML='<b>'+(i+1)+'</b><i>'+calendarMonthShort(q)+' '+q.day+'</i>';if(matching.length)cell.title=matching.map(x=>x.record.description).join(' · ');grid.appendChild(cell);}
  while(grid.children.length<378){const e=document.createElement('div');e.className='empty';grid.appendChild(e);}updateHeader();
 }
 
