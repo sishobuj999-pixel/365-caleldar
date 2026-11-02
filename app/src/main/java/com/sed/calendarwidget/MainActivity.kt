@@ -118,6 +118,7 @@ button{font:inherit;cursor:pointer;color:white}
 .glass{background:rgba(24,39,63,.46);border:1px solid rgba(255,255,255,.30);box-shadow:0 18px 55px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.12);-webkit-backdrop-filter:blur(18px) saturate(145%);backdrop-filter:blur(18px) saturate(145%)}
 .overlay{position:absolute;inset:0;background:rgba(3,9,20,.22);-webkit-backdrop-filter:blur(14px) saturate(130%);backdrop-filter:blur(14px) saturate(130%);display:flex;align-items:center;justify-content:center;padding:6cqw;z-index:5;opacity:0;visibility:hidden;transition:opacity .24s ease,visibility .24s ease}
 .overlay.show{opacity:1;visibility:visible}
+.historyOverlay{position:absolute;inset:0;z-index:10;padding:3cqw;background:rgba(3,9,20,.30);-webkit-backdrop-filter:blur(20px) saturate(135%);backdrop-filter:blur(20px) saturate(135%);display:flex;align-items:stretch;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease}.historyOverlay.show{opacity:1;visibility:visible}.historyPanel{width:100%;height:100%;border-radius:4cqw;padding:4cqw;display:flex;flex-direction:column;min-height:0;transform:translateY(12px);transition:transform .24s ease}.historyOverlay.show .historyPanel{transform:translateY(0)}.historyHead{display:flex;justify-content:space-between;align-items:center;gap:2cqw;margin-bottom:2cqw}.historyHead h2{font-size:5cqw}.historyHead p{font-size:2.5cqw;color:rgba(255,255,255,.68);margin-top:1cqw}.historySummary{font-size:2.5cqw;color:rgba(255,255,255,.78);padding:2cqw;border-radius:2cqw;background:rgba(255,255,255,.07);margin-bottom:2cqw}.historyFilters{display:flex;gap:1.5cqw;overflow-x:auto;padding:0 0 2cqw;flex-shrink:0}.historyFilter{white-space:nowrap;border:1px solid rgba(255,255,255,.2);border-radius:99px;padding:1.8cqw 3cqw;background:rgba(255,255,255,.08);font-size:2.4cqw}.historyFilter.active{background:rgba(59,130,246,.72);border-color:rgba(255,255,255,.5)}.historyList{overflow:auto;min-height:0;flex:1;padding-right:1cqw;overscroll-behavior:contain}.historyCard{padding:2.7cqw;border:1px solid rgba(255,255,255,.18);border-radius:2.7cqw;background:rgba(255,255,255,.075);margin-bottom:2cqw}.historyMeta{font-size:2.2cqw;color:#a9c9ff;margin-bottom:1cqw}.historyCard strong{display:block;font-size:3cqw;line-height:1.35;margin-bottom:1cqw}.historyCard p{font-size:2.55cqw;line-height:1.48;color:rgba(255,255,255,.88);white-space:pre-wrap}.historyPages{font-size:2.15cqw;color:rgba(255,255,255,.58);margin-top:1.5cqw;overflow-wrap:anywhere}.historyFoot{font-size:2.1cqw;color:rgba(255,255,255,.48);padding-top:2cqw;text-align:center;flex-shrink:0}.historyMore{display:block;width:100%;padding:2.5cqw;border:1px solid rgba(255,255,255,.2);border-radius:2cqw;background:rgba(255,255,255,.1);font-size:2.5cqw;margin:1cqw 0 2cqw}
 .modal{width:100%;max-width:440px;border-radius:5cqw;padding:5cqw;transform:translateY(14px) scale(.96);transition:transform .28s cubic-bezier(.2,.8,.2,1);max-height:88%;overflow:auto}
 .overlay.show .modal{transform:translateY(0) scale(1)}
 .modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:3cqw}
@@ -178,7 +179,7 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <div class="modalhead"><h2 id="modalTitle">Date</h2><button class="close" id="close">×</button></div>
 <div class="datebig" id="dateBig"></div><div class="countlabel" id="countLabel">Time remaining</div><div class="countdown" id="dateCountdown"></div><div class="durationBreakdown" aria-label="Calendar duration"><div class="durationStat"><strong id="yearsPart">0</strong><span>Years</span></div><div class="durationStat"><strong id="monthsPart">0</strong><span>Months</span></div><div class="durationStat"><strong id="daysPart">0</strong><span>Days</span></div></div><div class="countlabel" style="margin-top:2.5cqw">TOTAL DURATION</div><div class="durationBreakdown"><div class="durationStat"><strong id="totalDays">0</strong><span>Total days</span></div><div class="durationStat"><strong id="totalHours">0</strong><span>Total hours</span></div><div class="durationStat"><strong id="totalMinutes">0</strong><span>Total minutes</span></div></div>
 <div class="eventline" id="eventLine" style="display:none"></div>
-<div class="actions"><button class="round" id="add" aria-label="Add event">＋</button><button class="round" id="alarm" aria-label="Set alarm">◷</button></div>
+<div class="actions"><button class="round" id="historyOpen" aria-label="Explore history for this date">🌍</button><button class="round" id="add" aria-label="Add event">＋</button><button class="round" id="alarm" aria-label="Set alarm">◷</button></div>
 <div class="editor" id="editor"><label for="description">Event description</label><textarea id="description" placeholder="Write your event or reminder..."></textarea><button class="primary" id="eventOk">OK</button>
 <div class="scopeWrap" id="scopeWrap"><label>Repeat this event (choose one)</label>
 <label class="scope"><input type="radio" name="scope" value="month-year" checked> This month in this year</label>
@@ -188,6 +189,7 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <button class="primary" id="saveEvent">Save event</button><button class="danger" id="deleteEvent">Remove event</button></div></div>
 <div class="alarmEditor" id="alarmEditor"><label for="alarmTime">Choose alarm time</label><div class="digital" id="digitalTime">09:00</div><input id="alarmTime" type="time" value="09:00"><button class="primary" id="saveAlarm">Set device alarm</button><button class="secondary" id="cancelAlarm">Cancel</button><div id="alarmStatus" class="datebig"></div></div>
 </section></div>
+<div class="historyOverlay" id="historyOverlay"><section class="historyPanel glass"><div class="historyHead"><div><h2>History Explorer</h2><p id="historyDate"></p></div><button class="close" id="historyClose">×</button></div><div class="historySummary" id="historySummary">Choose a date to explore its history.</div><div class="historyFilters" id="historyFilters"><button class="historyFilter active" data-kind="all">All</button><button class="historyFilter" data-kind="events">Events</button><button class="historyFilter" data-kind="births">Births</button><button class="historyFilter" data-kind="deaths">Deaths</button><button class="historyFilter" data-kind="holidays">Holidays</button><button class="historyFilter" data-kind="selected">Selected</button></div><div class="historyList" id="historyList" aria-live="polite"><div class="emptyState">Loading historical records…</div></div><div class="historyFoot" id="historyFoot">Source: English Wikipedia · On this day</div></section></div>
 <section id="hub" class="glass">
 <div class="hubhead"><h2 id="hubTitle">Calendar tools</h2><button class="close" id="hubBack">×</button></div>
 <div id="homePage" class="page active"><div class="hubgrid">
@@ -269,6 +271,61 @@ function openDate(d){
  updateDateCountdown();document.getElementById('overlay').classList.add('show');
 }
 function updateDateCountdown(){if(!selectedDate)return;const target=new Date(selectedDate.getFullYear(),selectedDate.getMonth(),selectedDate.getDate()),now=new Date(),nowDay=new Date(now.getFullYear(),now.getMonth(),now.getDate()),future=target>=nowDay,start=future?nowDay:target,end=future?target:nowDay,ms=Math.abs(target-now),label=document.getElementById('countLabel'),value=document.getElementById('dateCountdown');if(ms>0){label.textContent=future?'TIME REMAINING':'TIME SINCE THIS DATE';value.textContent=parts(ms)+(future?'':' ago');}else{label.textContent='TODAY';value.textContent='This date is today';}let y=end.getFullYear()-start.getFullYear(),anchor=new Date(start);anchor.setFullYear(start.getFullYear()+y);if(anchor>end){y--;anchor=new Date(start);anchor.setFullYear(start.getFullYear()+y);}let m=(end.getFullYear()-anchor.getFullYear())*12+end.getMonth()-anchor.getMonth();let monthAnchor=new Date(anchor);monthAnchor.setDate(1);monthAnchor.setMonth(monthAnchor.getMonth()+m);const lastDay=new Date(monthAnchor.getFullYear(),monthAnchor.getMonth()+1,0).getDate();monthAnchor.setDate(Math.min(anchor.getDate(),lastDay));if(monthAnchor>end){m--;monthAnchor=new Date(anchor);monthAnchor.setDate(1);monthAnchor.setMonth(monthAnchor.getMonth()+m);monthAnchor.setDate(Math.min(anchor.getDate(),new Date(monthAnchor.getFullYear(),monthAnchor.getMonth()+1,0).getDate()));}const d=Math.floor((end-monthAnchor)/86400000),sec=Math.floor(ms/1000);document.getElementById('yearsPart').textContent=y;document.getElementById('monthsPart').textContent=m;document.getElementById('daysPart').textContent=d;document.getElementById('totalDays').textContent=Math.floor(sec/86400).toLocaleString();document.getElementById('totalHours').textContent=Math.floor(sec/3600).toLocaleString();document.getElementById('totalMinutes').textContent=Math.floor(sec/60).toLocaleString();}
+
+// Date History Explorer — keep every source record; do not deduplicate.
+const historyState={data:null,kind:'all',visible:50};
+const historyKinds=['events','births','deaths','holidays','selected'];
+function historyDateKey(d){return p(d.getMonth()+1)+'/'+p(d.getDate());}
+function historyCacheKey(d){return 'sedHistory_'+historyDateKey(d);}
+function historyRecords(){
+ if(!historyState.data)return [];
+ const kinds=historyState.kind==='all'?historyKinds:[historyState.kind],out=[];
+ kinds.forEach(kind=>(Array.isArray(historyState.data[kind])?historyState.data[kind]:[]).forEach((record,index)=>out.push({kind:kind,record:record,index:index})));
+ return out;
+}
+function historyLabel(kind){return ({events:'Historical event',births:'Born on this day',deaths:'Died on this day',holidays:'Holiday / observance',selected:'Featured anniversary'})[kind]||kind;}
+function renderHistory(){
+ const list=document.getElementById('historyList'),summary=document.getElementById('historySummary');
+ if(!historyState.data){list.innerHTML='<div class="emptyState">No historical records loaded.</div>';return;}
+ const all=historyKinds.reduce((n,k)=>n+(Array.isArray(historyState.data[k])?historyState.data[k].length:0),0),records=historyRecords(),shown=records.slice(0,historyState.visible);
+ summary.textContent=all.toLocaleString()+' records available · '+(historyState.kind==='all'?'All categories':historyLabel(historyState.kind))+' · Repeated entries are kept as supplied by the source.';
+ list.innerHTML='';
+ if(!records.length){list.innerHTML='<div class="emptyState">No records were returned for this category and date.</div>';return;}
+ shown.forEach(item=>{
+  const r=item.record||{},card=document.createElement('article');card.className='historyCard';
+  const meta=document.createElement('div');meta.className='historyMeta';meta.textContent=historyLabel(item.kind)+(r.year?' · '+r.year:'');
+  const pages=Array.isArray(r.pages)?r.pages:[],title=document.createElement('strong');title.textContent=pages[0]&&pages[0].title?pages[0].title.replace(/_/g,' '):'Historical record';
+  const body=document.createElement('p');body.textContent=r.text||r.description||r.title||'No additional description is available in this record.';
+  card.appendChild(meta);card.appendChild(title);card.appendChild(body);
+  if(pages.length){const related=document.createElement('div');related.className='historyPages';related.textContent='Related pages: '+pages.map(x=>(x.title||'').replace(/_/g,' ')).filter(Boolean).join(' · ');card.appendChild(related);}
+  list.appendChild(card);
+ });
+ if(records.length>shown.length){const more=document.createElement('button');more.className='historyMore';more.textContent='Show more ('+(records.length-shown.length).toLocaleString()+' remaining)';more.addEventListener('click',()=>{historyState.visible+=50;renderHistory();});list.appendChild(more);}
+}
+async function loadDateHistory(d,force){
+ const list=document.getElementById('historyList'),summary=document.getElementById('historySummary'),key=historyCacheKey(d);
+ historyState.kind='all';historyState.visible=50;historyState.data=null;
+ document.querySelectorAll('.historyFilter').forEach(b=>b.classList.toggle('active',b.dataset.kind==='all'));
+ document.getElementById('historyDate').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+ list.innerHTML='<div class="emptyState">Loading all available records…</div>';summary.textContent='Connecting to historical archive…';
+ if(!force){try{const cached=localStorage.getItem(key);if(cached){const saved=JSON.parse(cached);if(saved&&saved.data){historyState.data=saved.data;renderHistory();summary.textContent+=' · Cached copy';}}}catch(e){}}
+ if(!navigator.onLine){if(historyState.data){renderHistory();summary.textContent+=' · Offline copy';}else list.innerHTML='<div class="emptyState">Internet connection is unavailable. Connect to load this date’s history.</div>';return;}
+ try{
+  const response=await fetch('https://en.wikipedia.org/api/rest_v1/feed/onthisday/all/'+historyDateKey(d),{method:'GET',headers:{'Accept':'application/json'}});
+  if(!response.ok)throw new Error('Archive returned HTTP '+response.status);
+  const data=await response.json();historyState.data=data;
+  try{localStorage.setItem(key,JSON.stringify({savedAt:Date.now(),data:data}));}catch(e){}
+  renderHistory();
+ }catch(error){
+  if(historyState.data){renderHistory();summary.textContent+=' · Showing saved copy';}
+  else{list.innerHTML='<div class="emptyState">Could not load historical records. '+String(error.message||error)+'<br><button class="secondary" id="historyRetry">Try again</button></div>';const retry=document.getElementById('historyRetry');if(retry)retry.addEventListener('click',()=>loadDateHistory(d,true));}
+ }
+}
+document.getElementById('historyOpen').addEventListener('click',()=>{if(!selectedDate)return;document.getElementById('historyOverlay').classList.add('show');loadDateHistory(selectedDate,false);});
+document.getElementById('historyClose').addEventListener('click',()=>document.getElementById('historyOverlay').classList.remove('show'));
+document.getElementById('historyOverlay').addEventListener('click',e=>{if(e.target.id==='historyOverlay')document.getElementById('historyOverlay').classList.remove('show');});
+document.getElementById('historyFilters').addEventListener('click',e=>{const b=e.target.closest('.historyFilter');if(!b)return;historyState.kind=b.dataset.kind;historyState.visible=50;document.querySelectorAll('.historyFilter').forEach(x=>x.classList.toggle('active',x===b));renderHistory();});
+
 document.getElementById('add').addEventListener('click',()=>{document.getElementById('alarmEditor').classList.remove('show');document.getElementById('editor').classList.toggle('show');document.getElementById('scopeWrap').classList.remove('show');if(document.getElementById('editor').classList.contains('show'))document.getElementById('description').focus();});
 document.getElementById('eventOk').addEventListener('click',()=>{if(!document.getElementById('description').value.trim()){document.getElementById('description').focus();return;}document.getElementById('scopeWrap').classList.add('show');});
 document.getElementById('saveEvent').addEventListener('click',()=>{
@@ -289,7 +346,7 @@ document.getElementById('saveAlarm').addEventListener('click',()=>{
  status.textContent=result==='ok'?'Alarm set · '+t+' · default device alarm sound':result==='past'?'Choose a future time.':result==='permission'?'Allow notification permission, then set the alarm again.':result==='exact_permission'?'Allow Alarms & reminders access, return here and set it again.':'Could not set alarm.';
 });
 document.getElementById('cancelAlarm').addEventListener('click',()=>document.getElementById('alarmEditor').classList.remove('show'));
-function closeModal(){document.getElementById('overlay').classList.remove('show');selectedDate=null;}
+function closeModal(){document.getElementById('overlay').classList.remove('show');document.getElementById('historyOverlay').classList.remove('show');selectedDate=null;}
 document.getElementById('close').addEventListener('click',closeModal);document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
 function showHub(page){document.getElementById('hub').classList.add('show');showPage(page||'homePage');}
 function hideHub(){document.getElementById('hub').classList.remove('show');}
