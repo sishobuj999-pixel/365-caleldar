@@ -93,11 +93,11 @@ button{font:inherit;cursor:pointer;color:white}
 .sheet{container-type:inline-size;position:relative;width:min(100vw,calc(100vh*9/16));height:min(177.7778vw,100vh);background:rgba(20,30,49,.30);-webkit-backdrop-filter:blur(32px) saturate(165%);backdrop-filter:blur(32px) saturate(165%);border:1px solid var(--edge);border-radius:5cqw;padding:0;display:flex;flex-direction:column;box-shadow:0 12px 42px rgba(0,0,0,.2);touch-action:pan-y;overflow:hidden}
 .top{display:flex;justify-content:space-between;align-items:flex-end;padding:0 .4cqw 2.4cqw;min-height:19cqw}
 .yearnav{display:flex;align-items:center;gap:1.2cqw;min-width:0}.yearnav h1{cursor:ns-resize}.calendarSwitch{border:1px solid var(--edge);background:rgba(255,255,255,.12);border-radius:99px;padding:1.5cqw 2.2cqw;font-size:2.4cqw;font-weight:700;white-space:nowrap;color:#fff;max-width:25cqw}
-.top h1{font-size:17cqw;font-weight:800;letter-spacing:-.06em;line-height:.8;touch-action:pan-y;user-select:none}
+.top h1{font-size:14cqw;font-weight:800;letter-spacing:-.06em;line-height:.8;touch-action:pan-y;user-select:none}
 .nav,.iconbtn{border:1px solid var(--edge);background:rgba(255,255,255,.10);color:white;border-radius:50%;width:7cqw;height:7cqw;font-size:4cqw;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
 .nav:disabled{opacity:.15}
-.live{text-align:right;font-variant-numeric:tabular-nums;max-width:57%;min-width:0}
-#clk{font-size:5.2cqw;font-weight:800;letter-spacing:-.02em;line-height:1}
+.live{text-align:right;font-variant-numeric:tabular-nums;max-width:42%;min-width:0}
+#clk{font-size:4.8cqw;font-weight:800;letter-spacing:-.02em;line-height:1}
 #dt,#left{font-size:1.9cqw;font-weight:600;margin-top:.9cqw;line-height:1.35}
 #left{color:rgba(255,255,255,.88)}
 .wk,.g{display:grid;grid-template-columns:repeat(14,1fr)}
@@ -229,14 +229,16 @@ function dateForCalendarParts(y,m,day,cal=activeCalendar){
  const estimate=Math.floor(622+(y-1)*354.367/365.2425),from=new Date(estimate-1,0,1),to=new Date(estimate+2,0,1);for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){const q=calendarParts(d,'hijri');if(q.year===y&&q.month===m&&q.day===day)return new Date(d);}return null;
 }
 
+
 function calendarDuration(a,b,cal=activeCalendar){
  const start=a<=b?new Date(a):new Date(b),end=a<=b?new Date(b):new Date(a),s=calendarParts(start,cal),e=calendarParts(end,cal);
- let years=e.year-s.year,anchor=dateForCalendarParts(s.year+years,s.month,s.day,cal);if(!anchor)anchor=start;
- if(anchor>end){years--;anchor=dateForCalendarParts(s.year+years,s.month,s.day,cal)||start;}
- let months=(e.year-anchor.getFullYear())*12+(e.month-calendarParts(anchor,cal).month),monthAnchor=dateForCalendarParts(s.year+years,s.month+months,s.day,cal);
- while(monthAnchor&&monthAnchor>end&&months>0){months--;monthAnchor=dateForCalendarParts(s.year+years,s.month+months,s.day,cal);}
- if(!monthAnchor||monthAnchor>end)monthAnchor=anchor;
- return {years:years,months:months,days:Math.max(0,Math.round((end-monthAnchor)/86400000)),forward:a<=b};
+ let totalMonths=(e.year-s.year)*12+(e.month-s.month);
+ if(totalMonths<0)totalMonths=0;
+ function monthDate(count){const index=s.month-1+count,y=s.year+Math.floor(index/12),m=(index%12)+1;return dateForCalendarParts(y,m,s.day,cal);}
+ let anchor=monthDate(totalMonths);
+ while((!anchor||anchor>end)&&totalMonths>0){totalMonths--;anchor=monthDate(totalMonths);}
+ if(!anchor)anchor=start;
+ return {years:Math.floor(totalMonths/12),months:totalMonths%12,days:Math.max(0,Math.round((end-anchor)/86400000)),forward:a<=b};
 }
 function calendarYearStart(y,cal=activeCalendar){if(cal==='gregorian')return new Date(y,0,1);if(cal==='bangla')return new Date(y+593,3,14);return dateForCalendarParts(y,1,1,'hijri')||new Date(Math.floor(622+(y-1)*354.367/365.2425),0,1);}
 function calendarYearRange(cal=activeCalendar){const n=calendarParts(new Date(),cal).year;return cal==='gregorian'?{min:1900,max:2100}:{min:n-120,max:n+120};}
