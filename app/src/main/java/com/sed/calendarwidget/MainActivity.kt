@@ -259,7 +259,7 @@ function eventsForDate(date){const found=[];Object.keys(events).forEach(k=>{cons
 
 function renderYear(direction){
  const range=calendarYearRange();yearEl.textContent=shownYear;document.getElementById('calendarType').textContent=CALENDAR_NAMES[activeCalendar];document.getElementById('prev').disabled=shownYear<=range.min;document.getElementById('next').disabled=shownYear>=range.max;
- grid.classList.remove('year-next','year-prev');void grid.offsetWidth;grid.classList.add(direction==='next'?'year-next':'year-prev');grid.innerHTML='';
+ grid.classList.remove('year-next','year-prev','calendar-next','calendar-prev');void grid.offsetWidth;grid.classList.add(direction==='next'?'year-next':direction==='prev'?'year-prev':direction==='calendar-next'?'calendar-next':'calendar-prev');grid.innerHTML='';
  const first=calendarYearStart(shownYear),next=calendarYearStart(shownYear+1),offset=(first.getDay()+1)%7,total=Math.round((next-first)/86400000);
  for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='empty';grid.appendChild(e);}
  const today=new Date(),todayKey=keyFor(today);
@@ -281,10 +281,7 @@ yearNav.addEventListener('touchstart',e=>{e.stopPropagation();calendarTouchY=e.t
 yearNav.addEventListener('touchmove',e=>e.stopPropagation(),{passive:true});
 yearNav.addEventListener('touchend',e=>{e.stopPropagation();if(calendarTouchY===null)return;const dy=e.changedTouches[0].clientY-calendarTouchY;calendarTouchY=null;if(Math.abs(dy)>18)switchCalendar(dy<0?1:-1);},{passive:true});
 yearNav.addEventListener('wheel',e=>{e.preventDefault();if(calendarWheelLock)return;calendarWheelLock=1;switchCalendar(e.deltaY>0?-1:1);setTimeout(()=>calendarWheelLock=0,220);},{passive:false});
-let yearTouchY=null,yearWheelLock=0;
-yearEl.addEventListener('touchstart',e=>{e.stopPropagation();yearTouchY=e.touches[0].clientY;},{passive:true});
-yearEl.addEventListener('touchend',e=>{e.stopPropagation();if(yearTouchY===null)return;const dy=e.changedTouches[0].clientY-yearTouchY;yearTouchY=null;if(Math.abs(dy)>12)changeYear(dy<0?1:-1);},{passive:true});
-yearEl.addEventListener('wheel',e=>{e.preventDefault();if(yearWheelLock)return;yearWheelLock=1;changeYear(e.deltaY>0?1:-1);setTimeout(()=>yearWheelLock=0,100);},{passive:false});
+
 document.getElementById('prev').addEventListener('click',()=>changeYear(-1));document.getElementById('next').addEventListener('click',()=>changeYear(1));
 grid.addEventListener('click',e=>{const cell=e.target.closest('.day');if(!cell)return;const a=cell.dataset.date.split('-').map(Number);openDate(new Date(a[0],a[1]-1,a[2]));});
 
