@@ -38,7 +38,7 @@ class AlarmReceiver : BroadcastReceiver() {
         val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && manager.getNotificationChannel(channelId) == null) {
             val channel = NotificationChannel(channelId, "Calendar alarms", NotificationManager.IMPORTANCE_HIGH).apply {
-                description = "Date and event alarms"
+                this.description = "Date and event alarms"
                 setSound(alarmSound, AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
                 enableVibration(true)
