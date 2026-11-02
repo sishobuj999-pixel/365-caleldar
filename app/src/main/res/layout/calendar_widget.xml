@@ -9,14 +9,18 @@
             android:format12Hour="hh:mm:ss a" android:format24Hour="HH:mm:ss"
             android:textColor="#FFFFFF" android:textSize="27sp" android:fontFamily="sans"/>
         <TextView android:id="@+id/widget_year" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="2026"
-            android:textColor="#A5B4FC" android:textSize="23sp" android:textStyle="bold"/>
+            android:layout_height="wrap_content" android:text="365"
+            android:textColor="#FFFFFF" android:textSize="23sp" android:textStyle="bold"/>
     </LinearLayout>
     <TextClock android:id="@+id/widget_date" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:format12Hour="EEEE, d MMMM yyyy"
         android:format24Hour="EEEE, d MMMM yyyy" android:textColor="#D1D5DB" android:textSize="12sp"/>
     <TextView android:id="@+id/widget_countdown" android:layout_width="match_parent"
-        android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical"
+        android:layout_height="wrap_content" android:layout_marginTop="8dp"
         android:text="NEW YEAR 2027  •  -- DAYS LEFT"
-        android:textColor="#86EFAC" android:textSize="13sp" android:textStyle="bold"/>
+        android:textColor="#86EFAC" android:textSize="12sp" android:textStyle="bold"/>
+    <Chronometer android:id="@+id/widget_timer" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical"
+        android:textColor="#FFFFFF" android:textSize="23sp" android:textStyle="bold"
+        android:format="%s LEFT"/>
 </LinearLayout>
