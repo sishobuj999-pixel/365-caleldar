@@ -90,7 +90,7 @@ class MainActivity : Activity() {
 html,body{width:100%;height:100%;background:transparent;overflow:hidden}
 body{display:flex;justify-content:center;align-items:center;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--ink);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
 button{font:inherit;cursor:pointer;color:white}
-.sheet{container-type:inline-size;position:relative;width:min(100vw,calc(100vh*9/16));height:min(177.7778vw,100vh);background:rgba(20,30,49,.30);-webkit-backdrop-filter:blur(32px) saturate(165%);backdrop-filter:blur(32px) saturate(165%);border:1px solid var(--edge);border-radius:5cqw;padding:5cqw 3cqw 3cqw;display:flex;flex-direction:column;box-shadow:0 12px 42px rgba(0,0,0,.2);touch-action:pan-y;overflow:hidden}
+.sheet{container-type:inline-size;position:relative;width:min(100vw,calc(100vh*9/16));height:min(177.7778vw,100vh);background:rgba(20,30,49,.30);-webkit-backdrop-filter:blur(32px) saturate(165%);backdrop-filter:blur(32px) saturate(165%);border:1px solid var(--edge);border-radius:5cqw;padding:0;display:flex;flex-direction:column;box-shadow:0 12px 42px rgba(0,0,0,.2);touch-action:pan-y;overflow:hidden}
 .top{display:flex;justify-content:space-between;align-items:flex-end;padding:0 .4cqw 2.4cqw;min-height:19cqw}
 .yearnav{display:flex;align-items:center;gap:1.2cqw}
 .top h1{font-size:17cqw;font-weight:800;letter-spacing:-.06em;line-height:.8}
@@ -142,7 +142,8 @@ textarea{min-height:20cqw;resize:vertical}textarea::placeholder{color:rgba(255,2
 .scopeWrap{display:none;margin-top:3cqw}.scopeWrap.show{display:block}
 .digital{font-size:10cqw;font-weight:800;letter-spacing:.08em;text-align:center;font-variant-numeric:tabular-nums;padding:2cqw}
 input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-scheme:dark}
-#sheet{will-change:filter;transform:translateZ(0);transition:filter .42s cubic-bezier(.22,.75,.18,1);touch-action:none;user-select:none;-webkit-user-select:none}
+#sheet{transform:translateZ(0);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+#calendarLayer{position:absolute;inset:0;display:flex;flex-direction:column;padding:5cqw 3cqw 3cqw;filter:blur(0) saturate(1);will-change:filter;transform:translateZ(0);transition:filter .28s cubic-bezier(.22,.75,.18,1)}
 #hub{position:absolute;inset:0;z-index:8;border-radius:5cqw;padding:5cqw 4cqw;display:flex;flex-direction:column;transform:translate3d(0,105%,0);transition:transform .42s cubic-bezier(.22,.75,.18,1);overflow:hidden;will-change:transform;touch-action:none}
 #hub.show{transform:translate3d(0,0,0)}
 #hub.dragging,#sheet.dragging{transition:none!important}
@@ -170,9 +171,9 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 .settingrow input{width:5cqw;height:5cqw}
 @media(prefers-reduced-transparency:reduce){.sheet,.modal,#hub{background:rgba(20,30,49,.96)}}
 </style></head><body><main class="sheet" id="sheet">
-<div class="top"><div class="yearnav"><button class="nav" id="prev" aria-label="Previous year">‹</button><h1 id="year">2026</h1><button class="nav" id="next" aria-label="Next year">›</button></div><div class="live"><div id="clk">--:--:--</div><div id="dt"></div><div id="left"></div></div></div>
+<div id="calendarLayer"><div class="top"><div class="yearnav"><button class="nav" id="prev" aria-label="Previous year">‹</button><h1 id="year">2026</h1><button class="nav" id="next" aria-label="Next year">›</button></div><div class="live"><div id="clk">--:--:--</div><div id="dt"></div><div id="left"></div></div></div>
 <div class="wk"><span>SAT</span><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
-<div class="g" id="grid"></div><div class="hint">SWIPE LEFT / RIGHT · SWIPE UP FOR MORE</div>
+<div class="g" id="grid"></div><div class="hint">SWIPE LEFT / RIGHT · SWIPE UP FOR MORE</div></div>
 <div class="overlay" id="overlay"><section class="modal glass">
 <div class="modalhead"><h2 id="modalTitle">Date</h2><button class="close" id="close">×</button></div>
 <div class="datebig" id="dateBig"></div><div class="countlabel" id="countLabel">Time remaining</div><div class="countdown" id="dateCountdown"></div>
@@ -244,7 +245,7 @@ function updateHeader(){
  document.getElementById('dt').textContent=n.getDate()+' '+months[n.getMonth()].slice(0,3)+' '+n.getFullYear();
  const left=document.getElementById('left');
  if(shownYear===2026){const ms=new Date(2027,0,1)-n;left.textContent=ms>0?parts(ms)+' left':'2026 has ended';}
- else if(shownYear>n.getFullYear()){left.textContent='WILL COME AFTER · '+parts(new Date(shownYear,0,1)-n);}
+ else if(shownYear>n.getFullYear()){left.textContent='COUNTDOWN · '+parts(new Date(shownYear,0,1)-n);}
  else left.textContent='PAST YEAR';
 }
 function changeYear(delta){const next=shownYear+delta;if(next<2026||next>2040)return;shownYear=next;renderYear(delta>0?'next':'prev');}
@@ -319,13 +320,13 @@ function paintHub(progress){
  hubProgress=clamp(progress,0,1);
  hub.classList.add('dragging');sheet.classList.add('dragging');
  hub.style.transform='translate3d(0,'+((1-hubProgress)*100)+'%,0)';
- sheet.style.filter='blur('+(hubProgress*22).toFixed(2)+'px) saturate('+(1+hubProgress*.14)+')';
+ document.getElementById('calendarLayer').style.filter='blur('+(hubProgress*26).toFixed(2)+'px) saturate('+(1+hubProgress*.14)+')';
 }
 function settleHub(open){
  hubProgress=open?1:0;
  hub.classList.remove('dragging');sheet.classList.remove('dragging');
  hub.style.transform='';
- sheet.style.filter=open?'blur(22px) saturate(1.14)':'';
+ document.getElementById('calendarLayer').style.filter=open?'blur(26px) saturate(1.14)':'';
  if(open){hub.classList.add('show');}
  else{hub.classList.remove('show');}
 }
@@ -345,7 +346,7 @@ function moveDrag(e,source){
  const t=e.touches[0],dx=t.clientX-gesture.startX,dy=t.clientY-gesture.startY,now=performance.now();
  velocityY=(t.clientY-lastY)/Math.max(1,now-lastT);lastY=t.clientY;lastT=now;
  if(!gesture.mode){
-  if(Math.max(Math.abs(dx),Math.abs(dy))<8)return;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<5)return;
   if(Math.abs(dx)>Math.abs(dy)*1.12)gesture.mode='horizontal';
   else if(Math.abs(dy)>Math.abs(dx)*1.12)gesture.mode=source==='sheet'?(dy<0?'open':'none'):(dy>0?'close':'none');
   else return;
@@ -372,10 +373,10 @@ function finishDrag(source){
  gesture=null;
  if(mode==='open'){
   const m=transform.match(/,([-\d.]+)%/),remaining=m?Number(m[1]):100,progress=1-remaining/100;
-  settleHub(progress>=.34||v<-.52);
+  settleHub(progress>=.10||v<-.28);
  }else if(mode==='close'){
   const m=transform.match(/,([-\d.]+)%/),remaining=m?Number(m[1]):0,progress=1-remaining/100;
-  settleHub(!(progress<.66||v>.52));
+  settleHub(!(progress<.90||v>.28));
  }else if(mode==='horizontal'&&source==='sheet'){
   const m=grid.style.transform.match(/translate3d\(([-\d.]+)px/),distance=m?Number(m[1]):0;
   grid.style.transition='transform .30s cubic-bezier(.22,.75,.18,1),opacity .30s ease';
