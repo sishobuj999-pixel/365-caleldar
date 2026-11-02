@@ -3,6 +3,10 @@ package com.sed.calendarwidget
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
+import android.app.AlarmManager
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
@@ -65,7 +69,13 @@ class MainActivity : Activity() {
                 return "permission"
             }
             return try {
-                if (AlarmReceiver.schedule(this@MainActivity, year, month, day, hour, minute, description)) "ok" else "past"
+                val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                    val settingsIntent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                        Uri.parse("package:" + packageName)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(settingsIntent)
+                    "exact_permission"
+                } else if (AlarmReceiver.schedule(this@MainActivity, year, month, day, hour, minute, description)) "ok" else "past"
             } catch (_: Exception) { "error" }
         }
     }
@@ -263,7 +273,7 @@ document.getElementById('saveAlarm').addEventListener('click',()=>{
  const a=t.split(':').map(Number),matches=eventsForDate(selectedDate),desc=matches.map(x=>x.record.description).join(' / ');
  const result=window.AndroidAlarm?window.AndroidAlarm.scheduleAlarm(selectedDate.getFullYear(),selectedDate.getMonth()+1,selectedDate.getDate(),a[0],a[1],desc):'error';
  const status=document.getElementById('alarmStatus');
- status.textContent=result==='ok'?'Alarm set · '+t+' · default device alarm sound':result==='past'?'Choose a future time.':result==='permission'?'Allow notification permission, then set the alarm again.':'Could not set alarm.';
+ status.textContent=result==='ok'?'Alarm set · '+t+' · default device alarm sound':result==='past'?'Choose a future time.':result==='permission'?'Allow notification permission, then set the alarm again.':result==='exact_permission'?'Allow Alarms & reminders access, return here and set it again.':'Could not set alarm.';
 });
 document.getElementById('cancelAlarm').addEventListener('click',()=>document.getElementById('alarmEditor').classList.remove('show'));
 function closeModal(){document.getElementById('overlay').classList.remove('show');selectedDate=null;}
