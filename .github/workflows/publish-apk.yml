@@ -29,9 +29,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="v1.2.0"
+          TAG="v1.3.0"
           if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
             gh release upload "$TAG" app/build/outputs/apk/debug/app-debug.apk --repo "${{ github.repository }}" --clobber
           else
-            gh release create "$TAG" app/build/outputs/apk/debug/app-debug.apk --repo "${{ github.repository }}" --title "SED Calendar 2026 v1.2.0" --notes "Transparent glass app interface, 365 launcher identity, and live seconds countdown widget."
+            gh release create "$TAG" app/build/outputs/apk/debug/app-debug.apk --repo "${{ github.repository }}" --title "SED Calendar 2026 v1.3.0" --notes "Swipe through 2026–2040, per-date countdown popups, and locally saved red event markers."
           fi
