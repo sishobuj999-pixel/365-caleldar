@@ -198,7 +198,7 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <button class="tile" data-page="settingsPage"><span>⚙</span>Settings</button>
 <button class="tile" data-page="aboutPage"><span>ⓘ</span>About</button>
 <button class="tile" data-page="calculatorPage"><span>🧮</span>Date calculator</button>
-<button class="tile" id="languageToggle"><span>文A</span><span id="languageLabel">Language · বাংলা</span></button>
+<button class="tile" id="languageToggle" data-page="homePage"><span>文A</span><span id="languageLabel">Language · বাংলা</span></button>
 </div><p class="emptyState" id="swipeHint">Swipe down to return to calendar</p></div>
 <div id="eventsPage" class="page"><div class="pageTitle">All events</div><div id="eventsList"></div></div>
 <div id="notesPage" class="page"><div class="pageTitle">Notebook</div><div id="noteEditor" class="noteEditor glass"><input id="noteTitle" placeholder="Note title"><textarea id="noteBody" placeholder="Write your note..."></textarea><button class="primary" id="saveNote">Save note</button><button class="secondary" id="cancelNote">Cancel</button></div><div id="notesList"></div><button class="pen" id="newNote" aria-label="New note">✎</button></div>
