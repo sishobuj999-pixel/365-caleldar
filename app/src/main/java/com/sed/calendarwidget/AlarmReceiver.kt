@@ -15,8 +15,24 @@ import java.util.Calendar
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            val prefs = context.getSharedPreferences("sed_calendar_alarms", Context.MODE_PRIVATE)
+            prefs.all.filterKeys { it.startsWith("alarm_") }.values.forEach { value ->
+                val fields = (value as? String)?.split(",", limit = 6) ?: return@forEach
+                if (fields.size == 6) {
+                    schedule(context, fields[0].toInt(), fields[1].toInt(), fields[2].toInt(),
+                        fields[3].toInt(), fields[4].toInt(), fields[5])
+                }
+            }
+            return
+        }
+
         val title = intent.getStringExtra("title") ?: "SED Calendar reminder"
         val description = intent.getStringExtra("description") ?: "You have an event today."
+        val id = intent.getIntExtra("notificationId", 8102)
+        context.getSharedPreferences("sed_calendar_alarms", Context.MODE_PRIVATE)
+            .edit().remove("alarm_" + id).apply()
+
         val channelId = "sed_calendar_alarms"
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -42,7 +58,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setContentText(description).setStyle(Notification.BigTextStyle().bigText(description))
             .setContentIntent(openIntent).setAutoCancel(true).setCategory(Notification.CATEGORY_ALARM)
             .setPriority(Notification.PRIORITY_MAX).setVibrate(longArrayOf(0, 500, 250, 500)).build()
-        manager.notify(intent.getIntExtra("notificationId", 8102), notification)
+        manager.notify(id, notification)
     }
 
     companion object {
@@ -54,6 +70,7 @@ class AlarmReceiver : BroadcastReceiver() {
             if (calendar.timeInMillis <= System.currentTimeMillis()) return false
             val id = year * 10000 + month * 100 + day
             val intent = Intent(context, AlarmReceiver::class.java).apply {
+                action = "com.sed.calendarwidget.DATE_ALARM"
                 putExtra("title", "SED Calendar · " + day + "/" + month + "/" + year)
                 putExtra("description", description.ifBlank { "Your scheduled reminder." })
                 putExtra("notificationId", id)
@@ -63,7 +80,11 @@ class AlarmReceiver : BroadcastReceiver() {
             val showIntent = PendingIntent.getActivity(context, id + 1, Intent(context, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) return false
             alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(calendar.timeInMillis, showIntent), pending)
+            val value = listOf(year, month, day, hour, minute).joinToString(",") + "," + description.replace(",", " ")
+            context.getSharedPreferences("sed_calendar_alarms", Context.MODE_PRIVATE)
+                .edit().putString("alarm_" + id, value).apply()
             return true
         }
     }
