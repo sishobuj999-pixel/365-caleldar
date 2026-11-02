@@ -1,0 +1,34 @@
+name: Publish SED Calendar APK
+
+on:
+  workflow_run:
+    workflows: ["Build SED Calendar APK"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download built APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sed-calendar-debug-apk
+          path: ./apk
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Publish APK as public release asset
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view v1.0.0 --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release upload v1.0.0 ./apk/app-debug.apk --repo "${{ github.repository }}" --clobber
+          else
+            gh release create v1.0.0 ./apk/app-debug.apk --repo "${{ github.repository }}" --title "SED Calendar 2026" --notes "Direct APK download for SED Calendar 2026."
+          fi
