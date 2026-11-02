@@ -203,7 +203,7 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <div id="notesPage" class="page"><div class="pageTitle">Notebook</div><div id="noteEditor" class="noteEditor glass"><input id="noteTitle" placeholder="Note title"><textarea id="noteBody" placeholder="Write your note..."></textarea><button class="primary" id="saveNote">Save note</button><button class="secondary" id="cancelNote">Cancel</button></div><div id="notesList"></div><button class="pen" id="newNote" aria-label="New note">✎</button></div>
 <div id="settingsPage" class="page"><div class="pageTitle">Settings</div><div class="settingrow"><span>24-hour clock</span><input type="checkbox" id="format24"></div><div class="settingrow"><span>Glass intensity</span><input type="range" id="glassLevel" min="10" max="42" value="30"></div><p class="emptyState">Settings are saved on this device.</p></div>
 <div id="aboutPage" class="page"><div class="pageTitle">SED Calendar</div><div class="item"><strong>SED Calendar 1900–2100</strong><p>Calendar, recurring events, alarms and private notebook.</p></div></div>
-<div id="calculatorPage" class="page"><div class="pageTitle">Date calculator</div><div class="item"><label for="calcStart">From date</label><input id="calcStart" type="date"><label for="calcEnd" style="margin-top:2.5cqw">To date</label><input id="calcEnd" type="date"><button class="primary" id="calculateDates" style="width:100%">Calculate duration</button></div><div id="calcResult" class="item" aria-live="polite"><strong>Select two dates</strong><p>See the exact calendar difference in years, months and days.</p></div></div>
+<div id="calculatorPage" class="page"><div class="pageTitle">Date calculator</div><div class="item"><label for="calcStart">From date</label><input id="calcStart" type="text" inputmode="numeric" placeholder="YYYY-MM-DD"><label for="calcEnd" style="margin-top:2.5cqw">To date</label><input id="calcEnd" type="text" inputmode="numeric" placeholder="YYYY-MM-DD"><button class="primary" id="calculateDates" style="width:100%">Calculate duration</button></div><div id="calcResult" class="item" aria-live="polite"><strong>Select two dates</strong><p>See the exact calendar difference in years, months and days.</p></div></div>
 </section></main>
 <script>
 const grid=document.getElementById('grid'),yearEl=document.getElementById('year');
@@ -227,6 +227,16 @@ function dateForCalendarParts(y,m,day,cal=activeCalendar){
  if(cal==='gregorian'){const d=new Date(y,m-1,day);return d.getFullYear()===y&&d.getMonth()===m-1&&d.getDate()===day?d:null;}
  if(cal==='bangla'){const lens=banglaMonthLengths(y);if(m<1||m>12||day<1||day>lens[m-1])return null;const d=new Date(y+593,3,14);let off=day-1;for(let i=0;i<m-1;i++)off+=lens[i];d.setDate(d.getDate()+off);return d;}
  const estimate=Math.floor(622+(y-1)*354.367/365.2425),from=new Date(estimate-1,0,1),to=new Date(estimate+2,0,1);for(let d=new Date(from);d<to;d.setDate(d.getDate()+1)){const q=calendarParts(d,'hijri');if(q.year===y&&q.month===m&&q.day===day)return new Date(d);}return null;
+}
+
+function calendarDuration(a,b,cal=activeCalendar){
+ const start=a<=b?new Date(a):new Date(b),end=a<=b?new Date(b):new Date(a),s=calendarParts(start,cal),e=calendarParts(end,cal);
+ let years=e.year-s.year,anchor=dateForCalendarParts(s.year+years,s.month,s.day,cal);if(!anchor)anchor=start;
+ if(anchor>end){years--;anchor=dateForCalendarParts(s.year+years,s.month,s.day,cal)||start;}
+ let months=(e.year-anchor.getFullYear())*12+(e.month-calendarParts(anchor,cal).month),monthAnchor=dateForCalendarParts(s.year+years,s.month+months,s.day,cal);
+ while(monthAnchor&&monthAnchor>end&&months>0){months--;monthAnchor=dateForCalendarParts(s.year+years,s.month+months,s.day,cal);}
+ if(!monthAnchor||monthAnchor>end)monthAnchor=anchor;
+ return {years:years,months:months,days:Math.max(0,Math.round((end-monthAnchor)/86400000)),forward:a<=b};
 }
 function calendarYearStart(y,cal=activeCalendar){if(cal==='gregorian')return new Date(y,0,1);if(cal==='bangla')return new Date(y+593,3,14);return dateForCalendarParts(y,1,1,'hijri')||new Date(Math.floor(622+(y-1)*354.367/365.2425),0,1);}
 function calendarYearRange(cal=activeCalendar){const n=calendarParts(new Date(),cal).year;return cal==='gregorian'?{min:1900,max:2100}:{min:n-120,max:n+120};}
@@ -271,28 +281,25 @@ yearEl.addEventListener('touchend',e=>{e.stopPropagation();if(yearTouchY===null)
 yearEl.addEventListener('wheel',e=>{e.preventDefault();if(yearWheelLock)return;yearWheelLock=1;changeYear(e.deltaY>0?1:-1);setTimeout(()=>yearWheelLock=0,100);},{passive:false});
 document.getElementById('prev').addEventListener('click',()=>changeYear(-1));document.getElementById('next').addEventListener('click',()=>changeYear(1));
 grid.addEventListener('click',e=>{const cell=e.target.closest('.day');if(!cell)return;const a=cell.dataset.date.split('-').map(Number);openDate(new Date(a[0],a[1]-1,a[2]));});
+
 function openDate(d){
- selectedDate=d;const matches=eventsForDate(d),k=keyFor(d),own=normalizeEvent(events[k]);
- document.getElementById('modalTitle').textContent=d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
- document.getElementById('dateBig').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ selectedDate=d;const matches=eventsForDate(d),k=keyFor(d),own=normalizeEvent(events[k]),g=calendarParts(d,'gregorian'),h=calendarParts(d,'hijri'),b=calendarParts(d,'bangla'),q=calendarParts(d,activeCalendar);
+ document.getElementById('modalTitle').textContent=q.day+' '+q.monthName+' '+q.year+' · '+CALENDAR_NAMES[activeCalendar];
+ document.getElementById('dateBig').textContent='Gregorian: '+g.day+' '+g.monthName+' '+g.year+'\nHijri: '+h.day+' '+h.monthName+' '+h.year+'\nBangla: '+b.day+' '+b.monthName+' '+b.year;
  document.getElementById('description').value=own&&own.description?own.description:'';
  document.getElementById('editor').classList.remove('show');document.getElementById('scopeWrap').classList.remove('show');
  document.getElementById('alarmEditor').classList.remove('show');document.querySelector('input[name="scope"][value="month-year"]').checked=true;
  const line=document.getElementById('eventLine');if(matches.length){line.textContent=matches.map(x=>x.record.description).join('\n');line.style.display='block';}else{line.style.display='none';}
  updateDateCountdown();document.getElementById('overlay').classList.add('show');
 }
-function updateDateCountdown(){if(!selectedDate)return;const target=new Date(selectedDate.getFullYear(),selectedDate.getMonth(),selectedDate.getDate()),now=new Date(),nowDay=new Date(now.getFullYear(),now.getMonth(),now.getDate()),future=target>=nowDay,start=future?nowDay:target,end=future?target:nowDay,ms=Math.abs(target-now),label=document.getElementById('countLabel'),value=document.getElementById('dateCountdown');if(ms>0){label.textContent=future?'TIME REMAINING':'TIME SINCE THIS DATE';value.textContent=parts(ms)+(future?'':' ago');}else{label.textContent='TODAY';value.textContent='This date is today';}let y=end.getFullYear()-start.getFullYear(),anchor=new Date(start);anchor.setFullYear(start.getFullYear()+y);if(anchor>end){y--;anchor=new Date(start);anchor.setFullYear(start.getFullYear()+y);}let m=(end.getFullYear()-anchor.getFullYear())*12+end.getMonth()-anchor.getMonth();let monthAnchor=new Date(anchor);monthAnchor.setDate(1);monthAnchor.setMonth(monthAnchor.getMonth()+m);const lastDay=new Date(monthAnchor.getFullYear(),monthAnchor.getMonth()+1,0).getDate();monthAnchor.setDate(Math.min(anchor.getDate(),lastDay));if(monthAnchor>end){m--;monthAnchor=new Date(anchor);monthAnchor.setDate(1);monthAnchor.setMonth(monthAnchor.getMonth()+m);monthAnchor.setDate(Math.min(anchor.getDate(),new Date(monthAnchor.getFullYear(),monthAnchor.getMonth()+1,0).getDate()));}const d=Math.floor((end-monthAnchor)/86400000),sec=Math.floor(ms/1000);document.getElementById('yearsPart').textContent=y;document.getElementById('monthsPart').textContent=m;document.getElementById('daysPart').textContent=d;document.getElementById('totalDays').textContent=Math.floor(sec/86400).toLocaleString();document.getElementById('totalHours').textContent=Math.floor(sec/3600).toLocaleString();document.getElementById('totalMinutes').textContent=Math.floor(sec/60).toLocaleString();}
 
-// Date History Explorer — keep every source record; do not deduplicate.
-const historyState={data:null,kind:'all',visible:50};
-const historyKinds=['events','births','deaths','holidays','selected'];
-function historyDateKey(d){return p(d.getMonth()+1)+'/'+p(d.getDate());}
-function historyCacheKey(d){return 'sedHistory_'+historyDateKey(d);}
-function historyRecords(){
- if(!historyState.data)return [];
- const kinds=historyState.kind==='all'?historyKinds:[historyState.kind],out=[];
- kinds.forEach(kind=>(Array.isArray(historyState.data[kind])?historyState.data[kind]:[]).forEach((record,index)=>out.push({kind:kind,record:record,index:index})));
- return out;
+function updateDateCountdown(){
+ if(!selectedDate)return;const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate()),target=new Date(selectedDate.getFullYear(),selectedDate.getMonth(),selectedDate.getDate()),future=target>=today,start=future?today:target,end=future?target:today,ms=Math.abs(target-now),label=document.getElementById('countLabel'),value=document.getElementById('dateCountdown');
+ if(ms>0){label.textContent=future?'TIME REMAINING':'TIME SINCE THIS DATE';value.textContent=parts(ms)+(future?'':' ago');}else{label.textContent='TODAY';value.textContent='This date is today';}
+ const diff=calendarDuration(start,end,activeCalendar),sec=Math.floor(ms/1000),stats=document.querySelectorAll('.durationStat span');
+ document.getElementById('yearsPart').textContent=diff.years;document.getElementById('monthsPart').textContent=diff.months;document.getElementById('daysPart').textContent=diff.days;
+ stats[0].textContent=CALENDAR_NAMES[activeCalendar]+' years';stats[1].textContent=CALENDAR_NAMES[activeCalendar]+' months';stats[2].textContent='Days';
+ document.getElementById('totalDays').textContent=Math.floor(sec/86400).toLocaleString();document.getElementById('totalHours').textContent=Math.floor(sec/3600).toLocaleString();document.getElementById('totalMinutes').textContent=Math.floor(sec/60).toLocaleString();
 }
 function historyLabel(kind){return ({events:'Historical event',births:'Born on this day',deaths:'Died on this day',holidays:'Holiday / observance',selected:'Featured anniversary'})[kind]||kind;}
 function renderHistory(){
@@ -369,10 +376,10 @@ function renderEvents(){
  if(!keys.length){list.innerHTML='<div class="emptyState">No saved events yet.</div>';return;}
  keys.forEach(k=>{const rec=normalizeEvent(events[k]);if(!rec||!rec.description)return;const a=k.split('-').map(Number),d=new Date(a[0],a[1]-1,a[2]),el=document.createElement('button');el.className='item';el.style.width='100%';el.style.textAlign='left';el.innerHTML='<strong></strong><small></small><p></p>';el.querySelector('strong').textContent=rec.description;el.querySelector('small').textContent=d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+' · '+scopeName(rec.scope);el.querySelector('p').textContent='Tap to open date';el.addEventListener('click',()=>{hideHub();openDate(d);});list.appendChild(el);});
 }
-function initDateCalculator(){const a=document.getElementById('calcStart'),b=document.getElementById('calcEnd');if(!a.value||!b.value){const t=new Date(),v=t.getFullYear()+'-'+p(t.getMonth()+1)+'-'+p(t.getDate());if(!a.value)a.value=v;if(!b.value)b.value=v;}}
-function parseLocalDate(value){if(!value)return null;const a=value.split('-').map(Number);return new Date(a[0],a[1]-1,a[2]);}
+function initDateCalculator(){const a=document.getElementById('calcStart'),b=document.getElementById('calcEnd'),t=calendarParts(new Date()),v=t.year+'-'+p(t.month)+'-'+p(t.day);a.placeholder=b.placeholder='YYYY-MM-DD ('+CALENDAR_NAMES[activeCalendar]+')';if(!a.value)a.value=v;if(!b.value)b.value=v;}
+function parseLocalDate(value){if(!value)return null;const a=value.split('-').map(Number);if(a.length!==3||a.some(x=>!Number.isFinite(x)))return null;return dateForCalendarParts(a[0],a[1],a[2],activeCalendar);}
 function calendarDifference(a,b){let start=a<=b?new Date(a):new Date(b),end=a<=b?new Date(b):new Date(a);let years=end.getFullYear()-start.getFullYear(),anchor=new Date(start);anchor.setFullYear(start.getFullYear()+years);if(anchor>end){years--;anchor=new Date(start);anchor.setFullYear(start.getFullYear()+years);}let months=(end.getFullYear()-anchor.getFullYear())*12+end.getMonth()-anchor.getMonth(),monthAnchor=new Date(anchor);monthAnchor.setDate(1);monthAnchor.setMonth(monthAnchor.getMonth()+months);monthAnchor.setDate(Math.min(anchor.getDate(),new Date(monthAnchor.getFullYear(),monthAnchor.getMonth()+1,0).getDate()));if(monthAnchor>end){months--;monthAnchor=new Date(anchor);monthAnchor.setDate(1);monthAnchor.setMonth(monthAnchor.getMonth()+months);monthAnchor.setDate(Math.min(anchor.getDate(),new Date(monthAnchor.getFullYear(),monthAnchor.getMonth()+1,0).getDate()));}return {years,months,days:Math.round((end-monthAnchor)/86400000),forward:a<=b};}
-document.getElementById('calculateDates').addEventListener('click',()=>{const a=parseLocalDate(document.getElementById('calcStart').value),b=parseLocalDate(document.getElementById('calcEnd').value),out=document.getElementById('calcResult');if(!a||!b){out.innerHTML='<strong>Choose both dates</strong><p>Please select a start date and an end date.</p>';return;}const d=calendarDifference(a,b),from=a.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}),to=b.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});out.innerHTML='<strong>'+(d.forward?'Time elapsed / remaining':'Date difference')+'</strong><p>'+from+' → '+to+'</p><div class="durationBreakdown"><div class="durationStat"><strong>'+d.years+'</strong><span>Years</span></div><div class="durationStat"><strong>'+d.months+'</strong><span>Months</span></div><div class="durationStat"><strong>'+d.days+'</strong><span>Days</span></div></div>';});
+document.getElementById('calculateDates').addEventListener('click',()=>{const a=parseLocalDate(document.getElementById('calcStart').value),b=parseLocalDate(document.getElementById('calcEnd').value),out=document.getElementById('calcResult');if(!a||!b){out.innerHTML='<strong>Choose both dates</strong><p>Please select a start date and an end date.</p>';return;}const d=calendarDuration(a,b,activeCalendar),qa=calendarParts(a),qb=calendarParts(b),from=qa.day+' '+qa.monthName+' '+qa.year,to=qb.day+' '+qb.monthName+' '+qb.year;out.innerHTML='<strong>'+(d.forward?'Time elapsed / remaining':'Date difference')+'</strong><p>'+from+' → '+to+'</p><div class="durationBreakdown"><div class="durationStat"><strong>'+d.years+'</strong><span>Years</span></div><div class="durationStat"><strong>'+d.months+'</strong><span>Months</span></div><div class="durationStat"><strong>'+d.days+'</strong><span>Days</span></div></div>';});
 function scopeName(s){return ({'month-year':'This month in this year','all-months-year':'Every month in this year','month-all-years':'This month in every year','all-months-all-years':'Every month in every year'})[s]||'One date';}
 function persistNotes(){localStorage.setItem('sedCalendarNotes',JSON.stringify(notes));}
 function renderNotes(){
