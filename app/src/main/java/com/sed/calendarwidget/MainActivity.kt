@@ -30,6 +30,7 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.TRANSPARENT)
             overScrollMode = View.OVER_SCROLL_NEVER
             settings.javaScriptEnabled = true
+            settings.domStorageEnabled = true
             settings.loadWithOverviewMode = true
             settings.useWideViewPort = true
             settings.cacheMode = WebSettings.LOAD_NO_CACHE
