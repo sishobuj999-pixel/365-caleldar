@@ -92,7 +92,7 @@ body{display:flex;justify-content:center;align-items:center;font-family:"Helveti
 button{font:inherit;cursor:pointer;color:white}
 .sheet{container-type:inline-size;position:relative;width:min(100vw,calc(100vh*9/16));height:min(177.7778vw,100vh);background:rgba(20,30,49,.30);-webkit-backdrop-filter:blur(32px) saturate(165%);backdrop-filter:blur(32px) saturate(165%);border:1px solid var(--edge);border-radius:5cqw;padding:0;display:flex;flex-direction:column;box-shadow:0 12px 42px rgba(0,0,0,.2);touch-action:pan-y;overflow:hidden}
 .top{display:flex;justify-content:space-between;align-items:flex-end;padding:0 .4cqw 2.4cqw;min-height:19cqw}
-.yearnav{display:flex;align-items:center;gap:1.2cqw;min-width:0}.yearnav h1{cursor:ns-resize}.calendarSwitch{border:1px solid var(--edge);background:rgba(255,255,255,.12);border-radius:99px;padding:1.5cqw 2.2cqw;font-size:2.4cqw;font-weight:700;white-space:nowrap;color:#fff;max-width:25cqw}
+.yearnav{display:flex;align-items:baseline;gap:1.8cqw;min-width:0}.yearnav h1{cursor:ns-resize}.calendarName{font-size:2.65cqw;font-weight:650;color:rgba(255,255,255,.82);white-space:nowrap;letter-spacing:.015em;user-select:none}
 .top h1{font-size:14cqw;font-weight:800;letter-spacing:-.06em;line-height:.8;touch-action:pan-y;user-select:none}
 .nav,.iconbtn{border:1px solid var(--edge);background:rgba(255,255,255,.10);color:white;border-radius:50%;width:7cqw;height:7cqw;font-size:4cqw;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px)}
 .nav:disabled{opacity:.15}
@@ -103,7 +103,7 @@ button{font:inherit;cursor:pointer;color:white}
 .wk,.g{display:grid;grid-template-columns:repeat(14,1fr)}
 .wk span{font-size:1.5cqw;font-weight:700;text-align:center;padding:1.2cqw 0;border-top:.5cqw solid rgba(255,255,255,.85);border-bottom:1px solid var(--line)}
 .g{flex:1;min-height:0;grid-template-rows:repeat(27,minmax(0,1fr));border-left:1px solid var(--line);will-change:transform,opacity}
-.g.year-next{animation:yearNext .28s cubic-bezier(.2,.75,.25,1)}.g.year-prev{animation:yearPrev .28s cubic-bezier(.2,.75,.25,1)}
+.g.year-next{animation:yearNext .28s cubic-bezier(.2,.75,.25,1)}.g.year-prev{animation:yearPrev .28s cubic-bezier(.2,.75,.25,1)}.g.calendar-next{animation:calendarNext .34s cubic-bezier(.2,.75,.25,1)}.g.calendar-prev{animation:calendarPrev .34s cubic-bezier(.2,.75,.25,1)}@keyframes calendarNext{from{opacity:.25;transform:translateY(9%)}to{opacity:1;transform:translateY(0)}}@keyframes calendarPrev{from{opacity:.25;transform:translateY(-9%)}to{opacity:1;transform:translateY(0)}}
 @keyframes yearNext{from{opacity:.25;transform:translateX(9%)}to{opacity:1;transform:translateX(0)}}
 @keyframes yearPrev{from{opacity:.25;transform:translateX(-9%)}to{opacity:1;transform:translateX(0)}}
 .g .day{border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.25cqw;background:rgba(255,255,255,.035);min-width:0;overflow:hidden}
@@ -126,7 +126,7 @@ button{font:inherit;cursor:pointer;color:white}
 .close{border:1px solid var(--edge);background:rgba(255,255,255,.12);color:white;border-radius:50%;width:8cqw;height:8cqw;font-size:5cqw}
 .datebig{font-size:3.2cqw;color:rgba(255,255,255,.76);margin-bottom:3cqw}
 .countlabel{font-size:2.3cqw;color:#a9c9ff;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.2cqw}
-.countdown{font-size:3.3cqw;font-weight:800;line-height:1.5;font-variant-numeric:tabular-nums}\n.durationBreakdown{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5cqw;margin-top:2.5cqw}\n.durationStat{padding:2.2cqw 1cqw;border:1px solid rgba(255,255,255,.18);border-radius:2.5cqw;background:rgba(255,255,255,.075);text-align:center;min-width:0}\n.durationStat strong{display:block;font-size:4cqw;font-weight:800;font-variant-numeric:tabular-nums}\n.durationStat span{display:block;margin-top:.7cqw;font-size:1.9cqw;color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.06em}
+.countdown{font-size:3.3cqw;font-weight:800;line-height:1.5;font-variant-numeric:tabular-nums}\n.durationBreakdown{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.5cqw;margin-top:2.5cqw}.durationTable{grid-template-columns:repeat(3,minmax(0,1fr));gap:1.4cqw}\n.durationStat{padding:2.2cqw 1cqw;border:1px solid rgba(255,255,255,.18);border-radius:2.5cqw;background:rgba(255,255,255,.075);text-align:center;min-width:0}\n.durationStat strong{display:block;font-size:4cqw;font-weight:800;font-variant-numeric:tabular-nums}\n.durationStat span{display:block;margin-top:.7cqw;font-size:1.9cqw;color:rgba(255,255,255,.68);text-transform:uppercase;letter-spacing:.06em}
 .eventline{font-size:2.8cqw;margin-top:3cqw;padding:2.5cqw;border-radius:2cqw;background:rgba(255,255,255,.10);white-space:pre-wrap;overflow-wrap:anywhere}
 .actions{display:flex;justify-content:flex-end;gap:2cqw;margin-top:3cqw}
 .round{border:1px solid var(--edge);background:rgba(255,255,255,.13);color:white;border-radius:50%;width:10cqw;height:10cqw;font-size:5.5cqw;display:grid;place-items:center}
@@ -172,14 +172,14 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 .settingrow input{width:5cqw;height:5cqw}
 @media(prefers-reduced-transparency:reduce){.sheet,.modal,#hub{background:rgba(20,30,49,.96)}}
 </style></head><body><main class="sheet" id="sheet">
-<div id="calendarLayer"><div class="top"><div class="yearnav"><button class="nav" id="prev" aria-label="Previous year">‹</button><h1 id="year">2026</h1><button class="calendarSwitch" id="calendarType">Gregorian ▾</button><button class="nav" id="next" aria-label="Next year">›</button></div><div class="live"><div id="clk">--:--:--</div><div id="dt"></div><div id="left"></div></div></div>
+<div id="calendarLayer"><div class="top"><div class="yearnav"><button class="nav" id="prev" aria-label="Previous year">‹</button><h1 id="year">2026</h1><span class="calendarName" id="calendarType">Gregorian</span><button class="nav" id="next" aria-label="Next year">›</button></div><div class="live"><div id="clk">--:--:--</div><div id="dt"></div><div id="left"></div></div></div>
 <div class="wk"><span>SAT</span><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span></div>
 <div class="g" id="grid"></div><div class="hint">SWIPE LEFT / RIGHT · SWIPE UP FOR MORE</div></div>
 <div class="overlay" id="overlay"><section class="modal glass">
 <div class="modalhead"><h2 id="modalTitle">Date</h2><button class="close" id="close">×</button></div>
-<div class="datebig" id="dateBig"></div><div class="countlabel" id="countLabel">Time remaining</div><div class="countdown" id="dateCountdown"></div><div class="durationBreakdown" aria-label="Calendar duration"><div class="durationStat"><strong id="yearsPart">0</strong><span>Years</span></div><div class="durationStat"><strong id="monthsPart">0</strong><span>Months</span></div><div class="durationStat"><strong id="daysPart">0</strong><span>Days</span></div></div><div class="countlabel" style="margin-top:2.5cqw">TOTAL DURATION</div><div class="durationBreakdown"><div class="durationStat"><strong id="totalDays">0</strong><span>Total days</span></div><div class="durationStat"><strong id="totalHours">0</strong><span>Total hours</span></div><div class="durationStat"><strong id="totalMinutes">0</strong><span>Total minutes</span></div></div>
+<div class="datebig" id="dateBig"></div><div class="countlabel" id="countLabel">Time remaining</div><div class="countdown" id="dateCountdown"></div><div class="durationBreakdown durationTable" aria-label="Calendar countdown"><div class="durationStat"><strong id="yearsPart">0</strong><span>Years</span></div><div class="durationStat"><strong id="monthsPart">0</strong><span>Months</span></div><div class="durationStat"><strong id="daysPart">0</strong><span>Days</span></div><div class="durationStat"><strong id="totalHours">0</strong><span>Hours</span></div><div class="durationStat"><strong id="totalMinutes">0</strong><span>Minutes</span></div><div class="durationStat"><strong id="totalSeconds">0</strong><span>Seconds</span></div></div>
 <div class="eventline" id="eventLine" style="display:none"></div>
-<div class="actions"><button class="round" id="historyOpen" aria-label="Explore history for this date">🌍</button><button class="round" id="add" aria-label="Add event">＋</button><button class="round" id="alarm" aria-label="Set alarm">◷</button></div>
+<div class="actions"><button class="round" id="historyOpen" aria-label="Explore history for this date">▧</button><button class="round" id="add" aria-label="Add event">＋</button><button class="round" id="alarm" aria-label="Set alarm">◷</button></div>
 <div class="editor" id="editor"><label for="description">Event description</label><textarea id="description" placeholder="Write your event or reminder..."></textarea><button class="primary" id="eventOk">OK</button>
 <div class="scopeWrap" id="scopeWrap"><label>Repeat this event (choose one)</label>
 <label class="scope"><input type="radio" name="scope" value="month-year" checked> This month in this year</label>
@@ -258,7 +258,7 @@ function eventApplies(base,record,target){
 function eventsForDate(date){const found=[];Object.keys(events).forEach(k=>{const rec=normalizeEvent(events[k]);const a=k.split('-').map(Number);const base=new Date(a[0],a[1]-1,a[2]);if(rec&&rec.description&&eventApplies(base,rec,date))found.push({key:k,record:rec});});return found;}
 
 function renderYear(direction){
- const range=calendarYearRange();yearEl.textContent=shownYear;document.getElementById('calendarType').textContent=CALENDAR_NAMES[activeCalendar]+' ▾';document.getElementById('prev').disabled=shownYear<=range.min;document.getElementById('next').disabled=shownYear>=range.max;
+ const range=calendarYearRange();yearEl.textContent=shownYear;document.getElementById('calendarType').textContent=CALENDAR_NAMES[activeCalendar];document.getElementById('prev').disabled=shownYear<=range.min;document.getElementById('next').disabled=shownYear>=range.max;
  grid.classList.remove('year-next','year-prev');void grid.offsetWidth;grid.classList.add(direction==='next'?'year-next':'year-prev');grid.innerHTML='';
  const first=calendarYearStart(shownYear),next=calendarYearStart(shownYear+1),offset=(first.getDay()+1)%7,total=Math.round((next-first)/86400000);
  for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='empty';grid.appendChild(e);}
@@ -272,15 +272,15 @@ function updateHeader(){
  clock.textContent=use24?p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds()):n.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
  document.getElementById('dt').textContent=q.day+' '+q.monthName+' '+q.year+' · '+n.getDate()+' '+months[n.getMonth()].slice(0,3)+' '+n.getFullYear();
  const left=document.getElementById('left'),start=calendarYearStart(shownYear),end=calendarYearStart(shownYear+1),today=new Date(n.getFullYear(),n.getMonth(),n.getDate()),remain=Math.max(0,Math.ceil((end-today)/86400000));
- left.textContent=shownYear===q.year?(remain+' days left in '+CALENDAR_NAMES[activeCalendar]+' year'):shownYear>q.year?('COUNTDOWN · '+Math.max(0,Math.ceil((start-today)/86400000))+' days'):'PAST '+CALENDAR_NAMES[activeCalendar].toUpperCase()+' YEAR';
+ left.textContent=shownYear===q.year?(remain+' days left'):shownYear>q.year?(Math.max(0,Math.ceil((start-today)/86400000))+' days until start'):'Past year';
 }
 function changeYear(delta){const range=calendarYearRange(),next=shownYear+delta;if(next<range.min||next>range.max)return;shownYear=next;renderYear(delta>0?'next':'prev');}
-function switchCalendar(){const i=CALENDARS.indexOf(activeCalendar);activeCalendar=CALENDARS[(i+1)%CALENDARS.length];shownYear=calendarParts(new Date(),activeCalendar).year;const ca=document.getElementById('calcStart'),cb=document.getElementById('calcEnd');if(ca)ca.value='';if(cb)cb.value='';renderYear('next');updateDateCountdown();}
-let calendarSwipeX=null,skipCalendarClick=false;const calendarTypeButton=document.getElementById('calendarType');
-calendarTypeButton.addEventListener('click',()=>{if(skipCalendarClick){skipCalendarClick=false;return;}switchCalendar();});
-calendarTypeButton.addEventListener('touchstart',e=>{calendarSwipeX=e.touches[0].clientX;},{passive:true});
-calendarTypeButton.addEventListener('touchend',e=>{if(calendarSwipeX===null)return;const dx=e.changedTouches[0].clientX-calendarSwipeX;calendarSwipeX=null;if(Math.abs(dx)>12){skipCalendarClick=true;switchCalendar();setTimeout(()=>skipCalendarClick=false,450);}},{passive:true});
-calendarTypeButton.addEventListener('wheel',e=>{e.preventDefault();switchCalendar();},{passive:false});
+function switchCalendar(delta=1){const i=CALENDARS.indexOf(activeCalendar);activeCalendar=CALENDARS[(i+delta+CALENDARS.length)%CALENDARS.length];shownYear=calendarParts(new Date(),activeCalendar).year;const ca=document.getElementById('calcStart'),cb=document.getElementById('calcEnd');if(ca)ca.value='';if(cb)cb.value='';renderYear(delta>0?'calendar-next':'calendar-prev');updateDateCountdown();}
+let calendarTouchY=null,calendarWheelLock=0;const calendarTypeButton=document.getElementById('calendarType'),yearNav=document.querySelector('.yearnav');
+yearNav.addEventListener('touchstart',e=>{e.stopPropagation();calendarTouchY=e.touches[0].clientY;},{passive:true});
+yearNav.addEventListener('touchmove',e=>e.stopPropagation(),{passive:true});
+yearNav.addEventListener('touchend',e=>{e.stopPropagation();if(calendarTouchY===null)return;const dy=e.changedTouches[0].clientY-calendarTouchY;calendarTouchY=null;if(Math.abs(dy)>18)switchCalendar(dy<0?1:-1);},{passive:true});
+yearNav.addEventListener('wheel',e=>{e.preventDefault();if(calendarWheelLock)return;calendarWheelLock=1;switchCalendar(e.deltaY>0?-1:1);setTimeout(()=>calendarWheelLock=0,220);},{passive:false});
 let yearTouchY=null,yearWheelLock=0;
 yearEl.addEventListener('touchstart',e=>{e.stopPropagation();yearTouchY=e.touches[0].clientY;},{passive:true});
 yearEl.addEventListener('touchend',e=>{e.stopPropagation();if(yearTouchY===null)return;const dy=e.changedTouches[0].clientY-yearTouchY;yearTouchY=null;if(Math.abs(dy)>12)changeYear(dy<0?1:-1);},{passive:true});
@@ -290,7 +290,7 @@ grid.addEventListener('click',e=>{const cell=e.target.closest('.day');if(!cell)r
 
 function openDate(d){
  selectedDate=d;const matches=eventsForDate(d),k=keyFor(d),own=normalizeEvent(events[k]),g=calendarParts(d,'gregorian'),h=calendarParts(d,'hijri'),b=calendarParts(d,'bangla'),q=calendarParts(d,activeCalendar);
- document.getElementById('modalTitle').textContent=q.day+' '+q.monthName+' '+q.year+' · '+CALENDAR_NAMES[activeCalendar];
+ document.getElementById('modalTitle').textContent=q.day+' '+q.monthName+' '+q.year;
  document.getElementById('dateBig').innerHTML='<div class="calendarDateRow"><span>Gregorian</span><strong>'+g.day+' '+g.monthName+' '+g.year+'</strong></div><div class="calendarDateRow"><span>Hijri</span><strong>'+h.day+' '+h.monthName+' '+h.year+'</strong></div><div class="calendarDateRow"><span>Bangla</span><strong>'+b.day+' '+b.monthName+' '+b.year+'</strong></div><div class="calendarDateNote">Hijri date uses the Umm al-Qura calculation and may differ from Bangladesh moon-sighting by one day.</div>';
  document.getElementById('description').value=own&&own.description?own.description:'';
  document.getElementById('editor').classList.remove('show');document.getElementById('scopeWrap').classList.remove('show');
@@ -301,12 +301,16 @@ function openDate(d){
 
 function updateDateCountdown(){
  if(!selectedDate)return;const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate()),target=new Date(selectedDate.getFullYear(),selectedDate.getMonth(),selectedDate.getDate()),future=target>=today,start=future?today:target,end=future?target:today,ms=Math.abs(target-now),label=document.getElementById('countLabel'),value=document.getElementById('dateCountdown');
- if(ms>0){label.textContent=future?'TIME REMAINING':'TIME SINCE THIS DATE';value.textContent=parts(ms)+(future?'':' ago');}else{label.textContent='TODAY';value.textContent='This date is today';}
- const diff=calendarDuration(start,end,activeCalendar),sec=Math.floor(ms/1000),stats=document.querySelectorAll('.durationStat span');
+ const diff=calendarDuration(start,end,activeCalendar),sec=Math.floor(ms/1000),hours=Math.floor(sec/3600),minutes=Math.floor(sec/60),seconds=sec%60;
+ if(ms>0){label.textContent=future?'TIME REMAINING':'TIME SINCE THIS DATE';value.textContent=(diff.years?diff.years+'y  ':'')+(diff.months?diff.months+'mo  ':'')+diff.days+'d  '+p(hours%24)+'h  '+p(minutes%60)+'m  '+p(seconds)+'s'+(future?'':' ago');}else{label.textContent='TODAY';value.textContent='This date is today';}
  document.getElementById('yearsPart').textContent=diff.years;document.getElementById('monthsPart').textContent=diff.months;document.getElementById('daysPart').textContent=diff.days;
- stats[0].textContent=CALENDAR_NAMES[activeCalendar]+' years';stats[1].textContent=CALENDAR_NAMES[activeCalendar]+' months';stats[2].textContent='Days';
- document.getElementById('totalDays').textContent=Math.floor(sec/86400).toLocaleString();document.getElementById('totalHours').textContent=Math.floor(sec/3600).toLocaleString();document.getElementById('totalMinutes').textContent=Math.floor(sec/60).toLocaleString();
+ document.getElementById('totalHours').textContent=p(hours%24);document.getElementById('totalMinutes').textContent=p(minutes%60);document.getElementById('totalSeconds').textContent=p(seconds);
 }
+const historyKinds=['events','births','deaths','holidays','selected'];
+const historyState={data:null,kind:'all',visible:50};
+function historyDateKey(d){return p(d.getMonth()+1)+'/'+p(d.getDate());}
+function historyCacheKey(d){return 'sedHistory:'+historyDateKey(d);}
+function historyRecords(){if(!historyState.data)return [];const out=[];historyKinds.forEach(k=>(Array.isArray(historyState.data[k])?historyState.data[k]:[]).forEach(record=>out.push({kind:k,record})));return historyState.kind==='all'?out:out.filter(x=>x.kind===historyState.kind);}
 function historyLabel(kind){return ({events:'Historical event',births:'Born on this day',deaths:'Died on this day',holidays:'Holiday / observance',selected:'Featured anniversary'})[kind]||kind;}
 function renderHistory(){
  const list=document.getElementById('historyList'),summary=document.getElementById('historySummary');
@@ -332,13 +336,13 @@ async function loadDateHistory(d,force){
  document.querySelectorAll('.historyFilter').forEach(b=>b.classList.toggle('active',b.dataset.kind==='all'));
  document.getElementById('historyDate').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
  list.innerHTML='<div class="emptyState">Loading all available records…</div>';summary.textContent='Connecting to historical archive…';
- if(!force){try{const cached=localStorage.getItem(key);if(cached){const saved=JSON.parse(cached);if(saved&&saved.data){historyState.data=saved.data;renderHistory();summary.textContent+=' · Cached copy';}}}catch(e){}}
- if(!navigator.onLine){if(historyState.data){renderHistory();summary.textContent+=' · Offline copy';}else list.innerHTML='<div class="emptyState">Internet connection is unavailable. Connect to load this date’s history.</div>';return;}
+ if(!force){const cached=await readHistoryCache(historyDateKey(d));if(cached){historyState.data=cached;renderHistory();summary.textContent+=' · On-device archive';}}
+ if(!navigator.onLine){if(historyState.data){renderHistory();summary.textContent+=' · Offline copy';}else list.innerHTML='<div class="emptyState">Internet connection is unavailable. This date has not been cached yet.</div>';return;}
  try{
   const response=await fetch('https://en.wikipedia.org/api/rest_v1/feed/onthisday/all/'+historyDateKey(d),{method:'GET',headers:{'Accept':'application/json'}});
   if(!response.ok)throw new Error('Archive returned HTTP '+response.status);
   const data=await response.json();historyState.data=data;
-  try{localStorage.setItem(key,JSON.stringify({savedAt:Date.now(),data:data}));}catch(e){}
+  await writeHistoryCache(historyDateKey(d),data);
   renderHistory();
  }catch(error){
   if(historyState.data){renderHistory();summary.textContent+=' · Showing saved copy';}
@@ -349,6 +353,13 @@ document.getElementById('historyOpen').addEventListener('click',()=>{if(!selecte
 document.getElementById('historyClose').addEventListener('click',()=>document.getElementById('historyOverlay').classList.remove('show'));
 document.getElementById('historyOverlay').addEventListener('click',e=>{if(e.target.id==='historyOverlay')document.getElementById('historyOverlay').classList.remove('show');});
 document.getElementById('historyFilters').addEventListener('click',e=>{const b=e.target.closest('.historyFilter');if(!b)return;historyState.kind=b.dataset.kind;historyState.visible=50;document.querySelectorAll('.historyFilter').forEach(x=>x.classList.toggle('active',x===b));renderHistory();});
+// Quietly warm a local archive for every month/day. The calendar stays interactive while records download.
+const historyDbPromise=new Promise((resolve,reject)=>{if(!('indexedDB'in window)){resolve(null);return;}const req=indexedDB.open('SEDCalendarHistory',1);req.onupgradeneeded=()=>req.result.createObjectStore('days',{keyPath:'key'});req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null);});
+async function readHistoryCache(key){try{const db=await historyDbPromise;if(db){return await new Promise(resolve=>{const tx=db.transaction('days','readonly'),r=tx.objectStore('days').get(key);r.onsuccess=()=>resolve(r.result&&r.result.data||null);r.onerror=()=>resolve(null);});}}catch(e){}try{const x=localStorage.getItem('sedHistory:'+key);return x?JSON.parse(x).data:null;}catch(e){return null;}}
+async function writeHistoryCache(key,data){try{const db=await historyDbPromise;if(db){await new Promise(resolve=>{const tx=db.transaction('days','readwrite');tx.objectStore('days').put({key,data,savedAt:Date.now()});tx.oncomplete=resolve;tx.onerror=resolve;});return;}}catch(e){}try{localStorage.setItem('sedHistory:'+key,JSON.stringify({savedAt:Date.now(),data}));}catch(e){}}
+let historyWarmStarted=false;
+async function warmHistoryArchive(){if(historyWarmStarted||!navigator.onLine)return;historyWarmStarted=true;const db=await historyDbPromise;if(!db)return;const queue=[];for(let m=1;m<=12;m++){const days=new Date(2024,m,0).getDate();for(let d=1;d<=days;d++)queue.push(p(m)+'/'+p(d));}let cursor=0;async function worker(){while(cursor<queue.length){const key=queue[cursor++];if(await readHistoryCache(key))continue;try{const res=await fetch('https://en.wikipedia.org/api/rest_v1/feed/onthisday/all/'+key,{headers:{Accept:'application/json'}});if(res.ok)await writeHistoryCache(key,await res.json());}catch(e){}await new Promise(r=>setTimeout(r,180));}}await Promise.all([worker(),worker()]);}
+setTimeout(()=>{if('requestIdleCallback'in window)requestIdleCallback(()=>warmHistoryArchive());else warmHistoryArchive();},2500);
 
 document.getElementById('add').addEventListener('click',()=>{document.getElementById('alarmEditor').classList.remove('show');document.getElementById('editor').classList.toggle('show');document.getElementById('scopeWrap').classList.remove('show');if(document.getElementById('editor').classList.contains('show'))document.getElementById('description').focus();});
 document.getElementById('eventOk').addEventListener('click',()=>{if(!document.getElementById('description').value.trim()){document.getElementById('description').focus();return;}document.getElementById('scopeWrap').classList.add('show');});
