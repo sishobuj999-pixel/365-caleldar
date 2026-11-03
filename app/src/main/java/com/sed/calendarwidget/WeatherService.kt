@@ -15,6 +15,15 @@ import java.util.concurrent.Executors
 object WeatherService {
     private val executor = Executors.newSingleThreadExecutor()
 
+    fun refreshIfStale(context: Context) {
+        val prefs = context.getSharedPreferences("sed_weather", Context.MODE_PRIVATE)
+        val last = prefs.getLong("refresh_started", 0L)
+        if (System.currentTimeMillis() - last > 25 * 60 * 1000L) {
+            prefs.edit().putLong("refresh_started", System.currentTimeMillis()).apply()
+            refresh(context)
+        }
+    }
+
     fun refresh(context: Context, callback: ((String) -> Unit)? = null) {
         val app = context.applicationContext
         val fine = ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -104,7 +113,7 @@ object WeatherService {
             } catch (e: Exception) {
                 JSONObject().put("error", "Weather update failed: ${e.message ?: "network unavailable"}").toString()
             }
-            context.getSharedPreferences("sed_weather", Context.MODE_PRIVATE).edit().putString("weather_json", result).apply()
+            context.getSharedPreferences("sed_weather", Context.MODE_PRIVATE).edit().putString("weather_json", result).putLong("last_updated", System.currentTimeMillis()).apply()
             callback?.invoke(result)
             val providers = listOf(
                 CalendarWidgetProvider::class.java, WaterCalendarWidgetProvider::class.java,
