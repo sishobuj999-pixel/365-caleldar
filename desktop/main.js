@@ -8,7 +8,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 620,
     title: 'SED Calendar',
-    backgroundColor: '#101a2b',
+    backgroundColor: '#14171c',
     autoHideMenuBar: true,
     webPreferences: {
       contextIsolation: true,
