@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
 import android.os.Build
-import androidx.core.content.ContextCompat
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -26,8 +25,8 @@ object WeatherService {
 
     fun refresh(context: Context, callback: ((String) -> Unit)? = null) {
         val app = context.applicationContext
-        val fine = ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarse = ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val fine = app.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val coarse = app.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!fine && !coarse) {
             callback?.invoke("{\"error\":\"Location permission is required\"}")
             return
