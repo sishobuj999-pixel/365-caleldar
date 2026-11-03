@@ -8,10 +8,10 @@
             android:layout_height="wrap_content" android:layout_weight="1"
             android:format12Hour="hh:mm:ss a" android:format24Hour="HH:mm:ss"
             android:textColor="#FFFFFF" android:textSize="25sp" android:fontFamily="sans-serif-medium"/>
-        <TextView android:id="@+id/widget_year" android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:text="365"
-            android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold"
-            android:fontFamily="sans-serif-condensed"/>
+        <LinearLayout android:id="@+id/widget_weather_panel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="end|center_vertical" android:paddingStart="8dp">
+  <TextView android:id="@+id/widget_weather_temp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--°" android:textColor="#FFFFFFFF" android:textSize="25sp" android:textStyle="bold" android:fontFamily="sans-serif-condensed"/>
+  <TextView android:id="@+id/widget_weather_desc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weather" android:textColor="#DCE5E8" android:textSize="10sp" android:maxWidth="100dp" android:gravity="end"/>
+ </LinearLayout>
     </LinearLayout>
     <TextClock android:id="@+id/widget_date" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:format12Hour="EEEE, d MMMM yyyy"
@@ -32,8 +32,4 @@
             android:textColor="#FFFFFF" android:textSize="37sp" android:textStyle="bold"
             android:fontFamily="sans-serif-black" android:format="%s"/>
     </LinearLayout>
- <LinearLayout android:id="@+id/widget_shortcuts" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center" android:layout_marginTop="5dp" android:background="#18000000">
-  <TextView android:id="@+id/widget_shortcut_date" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:gravity="center" android:text="▦ Date" android:textColor="#FFFFFFFF" android:textSize="10sp"/>
-  <TextView android:id="@+id/widget_shortcut_weather" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:gravity="center" android:text="☀ Weather" android:textColor="#FFFFFFFF" android:textSize="10sp"/>
-  <TextView android:id="@+id/widget_shortcut_time" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:gravity="center" android:text="◷ Time" android:textColor="#FFFFFFFF" android:textSize="10sp"/>
- </LinearLayout></LinearLayout>
+ </LinearLayout>
