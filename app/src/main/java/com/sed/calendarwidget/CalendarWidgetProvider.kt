@@ -22,6 +22,7 @@ open class CalendarWidgetProvider : AppWidgetProvider() {
     protected open val layoutResource: Int = R.layout.calendar_widget
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        WeatherService.refreshIfStale(context)
         val now = LocalDateTime.now()
         val target = LocalDateTime.of(2027, Month.JANUARY, 1, 0, 0)
         val duration = Duration.between(now, target)
@@ -54,6 +55,9 @@ open class CalendarWidgetProvider : AppWidgetProvider() {
                 context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
+            val weather = runCatching { org.json.JSONObject(context.getSharedPreferences("sed_weather", Context.MODE_PRIVATE).getString("weather_json", "{}") ?: "{}") }.getOrNull()
+            val temperature = weather?.optDouble("temperature", Double.NaN) ?: Double.NaN
+            views.setTextViewText(R.id.widget_shortcut_weather, if (temperature.isFinite()) "☀ ${temperature.toInt()}° · Weather" else "☀ Weather")
             views.setOnClickPendingIntent(R.id.widget_root, pi)
             views.setOnClickPendingIntent(R.id.widget_shortcut_date, WidgetNavigation.pending(context, "date", id * 10 + 1))
             views.setOnClickPendingIntent(R.id.widget_shortcut_weather, WidgetNavigation.pending(context, "weather", id * 10 + 2))
@@ -81,6 +85,7 @@ open class AdvancedCalendarWidgetProvider:AppWidgetProvider(){
  private val bgs=intArrayOf(R.drawable.widget_glass,R.drawable.widget_water,R.drawable.widget_blur,R.drawable.widget_transparent)
  private fun show(v:RemoteViews,id:Int,on:Boolean){v.setViewVisibility(id,if(on)android.view.View.VISIBLE else android.view.View.GONE)}
  override fun onUpdate(context:Context,manager:AppWidgetManager,ids:IntArray){
+  WeatherService.refreshIfStale(context)
   val now=java.time.LocalDateTime.now();val start=now.withDayOfYear(1).toLocalDate().atStartOfDay();val next=now.plusYears(1).withDayOfYear(1).toLocalDate().atStartOfDay()
   val left=java.time.Duration.between(now,next).coerceAtLeast(java.time.Duration.ZERO);val days=left.toDays();val rem=left.minusDays(days).toMillis()
   val total=java.time.Duration.between(start,next).seconds.coerceAtLeast(1);val elapsed=java.time.Duration.between(start,now).seconds.coerceAtLeast(0);val pct=((elapsed*100.0)/total).toInt().coerceIn(0,100)
