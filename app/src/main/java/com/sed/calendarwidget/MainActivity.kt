@@ -422,7 +422,7 @@ document.getElementById('confirmClearEvent').addEventListener('click',()=>{
  });
  localStorage.setItem('sedCalendarEvents',JSON.stringify(events));
  const remaining=eventsForDate(selectedDate),line=document.getElementById('eventLine');
- line.textContent=remaining.map(x=>x.record.description).join('\\n');line.style.display=remaining.length?'block':'none';
+ line.textContent=remaining.map(x=>x.record.description).join('\n');line.style.display=remaining.length?'block':'none';
  document.getElementById('clearEvent').style.display=remaining.length?'grid':'none';
  document.getElementById('description').value='';document.getElementById('editor').classList.remove('show');document.getElementById('scopeWrap').classList.remove('show');document.getElementById('clearScopeWrap').classList.remove('show');renderYear();
 });
