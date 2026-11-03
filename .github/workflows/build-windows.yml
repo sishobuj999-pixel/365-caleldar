@@ -1,0 +1,42 @@
+name: Build SED Calendar Windows EXE
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/build-windows.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: desktop/package.json
+      - name: Install dependencies
+        working-directory: desktop
+        run: npm install
+      - name: Build Windows installer and portable EXE
+        working-directory: desktop
+        run: npm run dist:win
+      - name: Publish Windows EXE files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "v1.5.0"
+          if (gh release view $tag --repo "${{ github.repository }}" 2>$null) {
+            gh release upload $tag desktop/dist/*.exe --repo "${{ github.repository }}" --clobber
+          } else {
+            gh release create $tag desktop/dist/*.exe --repo "${{ github.repository }}" --title "SED Calendar 2026 v1.5.0" --notes "Calendar with note detail windows and Once/All recurring event clearing. Windows desktop edition."
+          }
