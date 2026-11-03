@@ -64,3 +64,47 @@ class BlurCalendarWidgetProvider : CalendarWidgetProvider() {
 class TransparentCalendarWidgetProvider : CalendarWidgetProvider() {
     override val layoutResource: Int = R.layout.calendar_widget_transparent
 }
+
+open class AdvancedCalendarWidgetProvider:AppWidgetProvider(){
+ protected open val style:Int=0
+ private val bgs=intArrayOf(R.drawable.widget_glass,R.drawable.widget_water,R.drawable.widget_blur,R.drawable.widget_transparent)
+ private fun show(v:RemoteViews,id:Int,on:Boolean){v.setViewVisibility(id,if(on)android.view.View.VISIBLE else android.view.View.GONE)}
+ override fun onUpdate(context:Context,manager:AppWidgetManager,ids:IntArray){
+  val now=java.time.LocalDateTime.now();val start=now.withDayOfYear(1).toLocalDate().atStartOfDay();val next=now.plusYears(1).withDayOfYear(1).toLocalDate().atStartOfDay()
+  val left=java.time.Duration.between(now,next).coerceAtLeast(java.time.Duration.ZERO);val days=left.toDays();val rem=left.minusDays(days).toMillis()
+  val total=java.time.Duration.between(start,next).seconds.coerceAtLeast(1);val elapsed=java.time.Duration.between(start,now).seconds.coerceAtLeast(0);val pct=((elapsed*100.0)/total).toInt().coerceIn(0,100)
+  val loc=java.util.Locale.getDefault();val month=now.month.getDisplayName(java.time.format.TextStyle.FULL,loc).uppercase(loc);val wd=now.dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL,loc);val week=now.get(java.time.temporal.WeekFields.of(loc).weekOfWeekBasedYear());val yd=now.toLocalDate().lengthOfYear()
+  ids.forEach{id->val v=RemoteViews(context.packageName,R.layout.calendar_widget_multi)
+   v.setInt(R.id.widget_root,"setBackgroundResource",bgs[style%4]);v.setTextViewText(R.id.widget_days,days.toString().padStart(2,'0'));v.setChronometer(R.id.widget_timer,android.os.SystemClock.elapsedRealtime()+rem,"%s",true);v.setChronometerCountDown(R.id.widget_timer,true)
+   v.setTextViewText(R.id.widget_year,now.year.toString());v.setTextViewText(R.id.widget_percent,"$pct%");v.setProgressBar(R.id.widget_progress,100,pct,false);v.setTextViewText(R.id.widget_dayofyear,"Day ${now.dayOfYear} of $yd");v.setTextViewText(R.id.widget_passed,"${now.dayOfYear-1} days passed");v.setTextViewText(R.id.widget_remaining,"$days days until New Year");v.setTextViewText(R.id.widget_daynum,now.dayOfMonth.toString());v.setTextViewText(R.id.widget_month,month);v.setTextViewText(R.id.widget_week,"WEEK $week · $wd".uppercase(loc))
+   val clock=style in listOf(0,1,4,5,6,7,8,9,11);val date=style in listOf(1,4,5,6,7,8,9,11);val count=style in listOf(3,6,8,9);val progress=style in listOf(2,7,9,10,11);val stats=style in listOf(7,9,10);val tile=style==4;val weekInfo=style==5||style==9
+   show(v,R.id.widget_header,clock);show(v,R.id.widget_clock,clock);show(v,R.id.widget_year,style in listOf(1,7,9));show(v,R.id.widget_date,date);show(v,R.id.widget_countdown_row,count);show(v,R.id.widget_progress_row,progress);show(v,R.id.widget_dayofyear,weekInfo||style in listOf(2,10,11));show(v,R.id.widget_passed,stats);show(v,R.id.widget_remaining,stats||style in listOf(3,6,8));show(v,R.id.widget_daynum,tile);show(v,R.id.widget_month,tile);show(v,R.id.widget_week,weekInfo)
+   if(style==0)v.setTextViewTextSize(R.id.widget_clock,android.util.TypedValue.COMPLEX_UNIT_SP,27f);if(style==8)v.setTextViewTextSize(R.id.widget_days,android.util.TypedValue.COMPLEX_UNIT_SP,42f)
+   val pi=PendingIntent.getActivity(context,style,Intent(context,MainActivity::class.java),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE);v.setOnClickPendingIntent(R.id.widget_root,pi);manager.updateAppWidget(id,v)
+  }
+ }
+}
+
+class MiniClockWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=0}
+
+class ClockStripWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=1}
+
+class YearProgressLineWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=2}
+
+class CountdownStripWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=3}
+
+class DateSquareWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=4}
+
+class WeekDayCardWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=5}
+
+class CountdownCardWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=6}
+
+class YearProgressCardWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=7}
+
+class VerticalCountdownWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=8}
+
+class YearStatisticsWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=9}
+
+class MinimalProgressWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=10}
+
+class DualInfoWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=11}
