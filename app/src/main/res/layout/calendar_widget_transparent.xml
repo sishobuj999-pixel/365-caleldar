@@ -12,7 +12,11 @@
             android:layout_height="wrap_content" android:text="365"
             android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold"
             android:fontFamily="sans-serif-condensed"/>
-    </LinearLayout>
+     <LinearLayout android:id="@+id/widget_shortcuts" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center" android:layout_marginTop="5dp" android:background="#18000000">
+  <TextView android:id="@+id/widget_shortcut_date" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:gravity="center" android:text="▦ Date" android:textColor="#FFFFFFFF" android:textSize="10sp"/>
+  <TextView android:id="@+id/widget_shortcut_weather" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:gravity="center" android:text="☀ Weather" android:textColor="#FFFFFFFF" android:textSize="10sp"/>
+  <TextView android:id="@+id/widget_shortcut_time" android:layout_width="0dp" android:layout_height="32dp" android:layout_weight="1" android:gravity="center" android:text="◷ Time" android:textColor="#FFFFFFFF" android:textSize="10sp"/>
+ </LinearLayout></LinearLayout>
     <TextClock android:id="@+id/widget_date" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:format12Hour="EEEE, d MMMM yyyy"
         android:format24Hour="EEEE, d MMMM yyyy" android:textColor="#DCE5E8" android:textSize="12sp"/>
