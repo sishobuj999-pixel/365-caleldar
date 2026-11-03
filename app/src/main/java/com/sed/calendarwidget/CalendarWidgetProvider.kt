@@ -50,32 +50,17 @@ open class CalendarWidgetProvider : AppWidgetProvider() {
                 views.setChronometerCountDown(R.id.widget_timer, true)
             }
 
-            val intent = Intent(context, MainActivity::class.java)
-            val pi = PendingIntent.getActivity(
-                context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
             val weather = runCatching { org.json.JSONObject(context.getSharedPreferences("sed_weather", Context.MODE_PRIVATE).getString("weather_json", "{}") ?: "{}") }.getOrNull()
             val temperature = weather?.optDouble("temperature", Double.NaN) ?: Double.NaN
             val description = weather?.optString("description", "Weather") ?: "Weather"
             views.setTextViewText(R.id.widget_weather_temp, if (temperature.isFinite()) "${temperature.toInt()}°" else "--°")
             views.setTextViewText(R.id.widget_weather_desc, description)
-            views.setOnClickPendingIntent(R.id.widget_root, pi)
-            views.setOnClickPendingIntent(R.id.widget_date, WidgetNavigation.pending(context, "date", id * 10 + 1))
-            views.setOnClickPendingIntent(R.id.widget_year, WidgetNavigation.pending(context, "date", id * 10 + 2))
-            views.setOnClickPendingIntent(R.id.widget_clock, WidgetNavigation.pending(context, "time", id * 10 + 3))
-            views.setOnClickPendingIntent(R.id.widget_weather_panel, WidgetNavigation.pending(context, "weather", id * 10 + 4))
-            views.setOnClickPendingIntent(R.id.widget_countdown_row, WidgetNavigation.pending(context, "countdown", id * 10 + 5))
-            views.setOnClickPendingIntent(R.id.widget_days, WidgetNavigation.pending(context, "countdown", id * 10 + 6))
-            views.setOnClickPendingIntent(R.id.widget_timer, WidgetNavigation.pending(context, "countdown", id * 10 + 7))
-            views.setOnClickPendingIntent(R.id.widget_progress_row, WidgetNavigation.pending(context, "progress", id * 10 + 8))
-            views.setOnClickPendingIntent(R.id.widget_percent, WidgetNavigation.pending(context, "progress", id * 10 + 9))
-            views.setOnClickPendingIntent(R.id.widget_dayofyear, WidgetNavigation.pending(context, "yearInfo", id * 10 + 10))
-            views.setOnClickPendingIntent(R.id.widget_passed, WidgetNavigation.pending(context, "yearInfo", id * 10 + 11))
-            views.setOnClickPendingIntent(R.id.widget_remaining, WidgetNavigation.pending(context, "countdown", id * 10 + 12))
-            views.setOnClickPendingIntent(R.id.widget_daynum, WidgetNavigation.pending(context, "date", id * 10 + 13))
-            views.setOnClickPendingIntent(R.id.widget_month, WidgetNavigation.pending(context, "date", id * 10 + 14))
-            views.setOnClickPendingIntent(R.id.widget_week, WidgetNavigation.pending(context, "yearInfo", id * 10 + 15))
+            // Only bind IDs present in the classic layouts; root intentionally has no click action.
+            views.setOnClickPendingIntent(R.id.widget_date, WidgetNavigation.pending(context, "date", id * 100 + 1))
+            views.setOnClickPendingIntent(R.id.widget_clock, WidgetNavigation.pending(context, "time", id * 100 + 2))
+            views.setOnClickPendingIntent(R.id.widget_weather_panel, WidgetNavigation.pending(context, "weather", id * 100 + 3))
+            views.setOnClickPendingIntent(R.id.widget_days, WidgetNavigation.pending(context, "countdown", id * 100 + 4))
+            views.setOnClickPendingIntent(R.id.widget_timer, WidgetNavigation.pending(context, "countdown", id * 100 + 5))
             manager.updateAppWidget(id, views)
         }
     }
@@ -114,25 +99,22 @@ open class AdvancedCalendarWidgetProvider:AppWidgetProvider(){
    val description=weather?.optString("description","Weather")?:"Weather"
    v.setTextViewText(R.id.widget_weather_temp,if(temp.isFinite()) "${temp.toInt()}°" else "--°")
    v.setTextViewText(R.id.widget_weather_desc,description)
-   val pi=PendingIntent.getActivity(context,style,Intent(context,MainActivity::class.java),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-   v.setOnClickPendingIntent(R.id.widget_root,pi)
-   v.setOnClickPendingIntent(R.id.widget_clock,WidgetNavigation.pending(context,"time",id*10+1))
-   v.setOnClickPendingIntent(R.id.widget_date,WidgetNavigation.pending(context,"date",id*10+2))
-   v.setOnClickPendingIntent(R.id.widget_year,WidgetNavigation.pending(context,"date",id*10+3))
-   v.setOnClickPendingIntent(R.id.widget_weather_panel,WidgetNavigation.pending(context,"weather",id*10+4))
-   // Every visible data group opens its own focused detail page.
-   v.setOnClickPendingIntent(R.id.widget_countdown_row,WidgetNavigation.pending(context,"countdown",id*10+5))
-   v.setOnClickPendingIntent(R.id.widget_days,WidgetNavigation.pending(context,"countdown",id*10+6))
-   v.setOnClickPendingIntent(R.id.widget_timer,WidgetNavigation.pending(context,"countdown",id*10+7))
-   v.setOnClickPendingIntent(R.id.widget_progress_row,WidgetNavigation.pending(context,"progress",id*10+8))
-   v.setOnClickPendingIntent(R.id.widget_percent,WidgetNavigation.pending(context,"progress",id*10+9))
-   v.setOnClickPendingIntent(R.id.widget_progress,WidgetNavigation.pending(context,"progress",id*10+10))
-   v.setOnClickPendingIntent(R.id.widget_dayofyear,WidgetNavigation.pending(context,"yearInfo",id*10+11))
-   v.setOnClickPendingIntent(R.id.widget_passed,WidgetNavigation.pending(context,"yearInfo",id*10+12))
-   v.setOnClickPendingIntent(R.id.widget_remaining,WidgetNavigation.pending(context,"countdown",id*10+13))
-   v.setOnClickPendingIntent(R.id.widget_daynum,WidgetNavigation.pending(context,"date",id*10+14))
-   v.setOnClickPendingIntent(R.id.widget_month,WidgetNavigation.pending(context,"date",id*10+15))
-   v.setOnClickPendingIntent(R.id.widget_week,WidgetNavigation.pending(context,"yearInfo",id*10+16))
+   // Keep the root inert so individual data areas receive their own page intents.
+   v.setOnClickPendingIntent(R.id.widget_clock,WidgetNavigation.pending(context,"time",id*100+21))
+   v.setOnClickPendingIntent(R.id.widget_date,WidgetNavigation.pending(context,"date",id*100+22))
+   v.setOnClickPendingIntent(R.id.widget_weather_panel,WidgetNavigation.pending(context,"weather",id*100+23))
+   v.setOnClickPendingIntent(R.id.widget_countdown_row,WidgetNavigation.pending(context,"countdown",id*100+24))
+   v.setOnClickPendingIntent(R.id.widget_days,WidgetNavigation.pending(context,"countdown",id*100+25))
+   v.setOnClickPendingIntent(R.id.widget_timer,WidgetNavigation.pending(context,"countdown",id*100+26))
+   v.setOnClickPendingIntent(R.id.widget_progress_row,WidgetNavigation.pending(context,"progress",id*100+27))
+   v.setOnClickPendingIntent(R.id.widget_percent,WidgetNavigation.pending(context,"progress",id*100+28))
+   v.setOnClickPendingIntent(R.id.widget_progress,WidgetNavigation.pending(context,"progress",id*100+29))
+   v.setOnClickPendingIntent(R.id.widget_dayofyear,WidgetNavigation.pending(context,"yearInfo",id*100+30))
+   v.setOnClickPendingIntent(R.id.widget_passed,WidgetNavigation.pending(context,"yearInfo",id*100+31))
+   v.setOnClickPendingIntent(R.id.widget_remaining,WidgetNavigation.pending(context,"countdown",id*100+32))
+   v.setOnClickPendingIntent(R.id.widget_daynum,WidgetNavigation.pending(context,"date",id*100+33))
+   v.setOnClickPendingIntent(R.id.widget_month,WidgetNavigation.pending(context,"date",id*100+34))
+   v.setOnClickPendingIntent(R.id.widget_week,WidgetNavigation.pending(context,"yearInfo",id*100+35))
    manager.updateAppWidget(id,v)
   }
  }
