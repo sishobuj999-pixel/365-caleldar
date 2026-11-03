@@ -11,6 +11,13 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.Month
 
+object WidgetNavigation {
+    fun pending(context: Context, page: String, requestCode: Int): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).putExtra("widget_page", page).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        return PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+}
+
 open class CalendarWidgetProvider : AppWidgetProvider() {
     protected open val layoutResource: Int = R.layout.calendar_widget
 
@@ -48,6 +55,10 @@ open class CalendarWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             views.setOnClickPendingIntent(R.id.widget_root, pi)
+            views.setOnClickPendingIntent(R.id.widget_shortcut_date, WidgetNavigation.pending(context, "date", id * 10 + 1))
+            views.setOnClickPendingIntent(R.id.widget_shortcut_weather, WidgetNavigation.pending(context, "weather", id * 10 + 2))
+            views.setOnClickPendingIntent(R.id.widget_shortcut_time, WidgetNavigation.pending(context, "time", id * 10 + 3))
+            views.setOnClickPendingIntent(R.id.widget_clock, WidgetNavigation.pending(context, "time", id * 10 + 4))
             manager.updateAppWidget(id, views)
         }
     }
@@ -80,7 +91,18 @@ open class AdvancedCalendarWidgetProvider:AppWidgetProvider(){
    val clock=style in listOf(0,1,4,5,6,7,8,9,11);val date=style in listOf(1,4,5,6,7,8,9,11);val count=style in listOf(3,6,8,9);val progress=style in listOf(2,7,9,10,11);val stats=style in listOf(7,9,10);val tile=style==4;val weekInfo=style==5||style==9
    show(v,R.id.widget_header,clock);show(v,R.id.widget_clock,clock);show(v,R.id.widget_year,style in listOf(1,7,9));show(v,R.id.widget_date,date);show(v,R.id.widget_countdown_row,count);show(v,R.id.widget_progress_row,progress);show(v,R.id.widget_dayofyear,weekInfo||style in listOf(2,10,11));show(v,R.id.widget_passed,stats);show(v,R.id.widget_remaining,stats||style in listOf(3,6,8));show(v,R.id.widget_daynum,tile);show(v,R.id.widget_month,tile);show(v,R.id.widget_week,weekInfo)
    if(style==0)v.setTextViewTextSize(R.id.widget_clock,android.util.TypedValue.COMPLEX_UNIT_SP,27f);if(style==8)v.setTextViewTextSize(R.id.widget_days,android.util.TypedValue.COMPLEX_UNIT_SP,42f)
-   val pi=PendingIntent.getActivity(context,style,Intent(context,MainActivity::class.java),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE);v.setOnClickPendingIntent(R.id.widget_root,pi);manager.updateAppWidget(id,v)
+   val weather=runCatching{org.json.JSONObject(context.getSharedPreferences("sed_weather",Context.MODE_PRIVATE).getString("weather_json","{}")?: "{}")}.getOrNull()
+   val temp=weather?.optDouble("temperature",Double.NaN)?:Double.NaN
+   val weatherLabel=if(temp.isFinite()) "☀ ${temp.toInt()}° · Weather" else "☀ Weather"
+   v.setTextViewText(R.id.widget_shortcut_weather,weatherLabel)
+   val pi=PendingIntent.getActivity(context,style,Intent(context,MainActivity::class.java),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+   v.setOnClickPendingIntent(R.id.widget_root,pi)
+   v.setOnClickPendingIntent(R.id.widget_shortcut_date,WidgetNavigation.pending(context,"date",id*10+1))
+   v.setOnClickPendingIntent(R.id.widget_shortcut_weather,WidgetNavigation.pending(context,"weather",id*10+2))
+   v.setOnClickPendingIntent(R.id.widget_shortcut_time,WidgetNavigation.pending(context,"time",id*10+3))
+   v.setOnClickPendingIntent(R.id.widget_clock,WidgetNavigation.pending(context,"time",id*10+4))
+   v.setOnClickPendingIntent(R.id.widget_date,WidgetNavigation.pending(context,"date",id*10+5))
+   manager.updateAppWidget(id,v)
   }
  }
 }
