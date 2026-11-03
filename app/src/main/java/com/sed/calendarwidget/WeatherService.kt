@@ -19,7 +19,10 @@ object WeatherService {
         val last = prefs.getLong("refresh_started", 0L)
         if (System.currentTimeMillis() - last > 25 * 60 * 1000L) {
             prefs.edit().putLong("refresh_started", System.currentTimeMillis()).apply()
-            refresh(context)
+            val lat = prefs.getString("latitude", null)?.toDoubleOrNull()
+            val lon = prefs.getString("longitude", null)?.toDoubleOrNull()
+            if (lat != null && lon != null) fetchWeather(context.applicationContext, lat, lon, null)
+            else refresh(context)
         }
     }
 
@@ -125,8 +128,13 @@ object WeatherService {
                 MinimalProgressWidgetProvider::class.java, DualInfoWidgetProvider::class.java
             )
             providers.forEach { provider ->
-                context.sendBroadcast(android.content.Intent(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-                    .setClass(context, provider))
+                val manager = android.appwidget.AppWidgetManager.getInstance(context)
+                val ids = manager.getAppWidgetIds(android.content.ComponentName(context, provider))
+                if (ids.isNotEmpty()) {
+                    context.sendBroadcast(android.content.Intent(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+                        .setComponent(android.content.ComponentName(context, provider))
+                        .putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids))
+                }
             }
         }
     }
