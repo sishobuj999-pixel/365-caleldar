@@ -141,6 +141,8 @@ textarea{min-height:20cqw;resize:vertical}textarea::placeholder{color:rgba(255,2
 .scope{display:flex;gap:2cqw;align-items:center;padding:2cqw;border-radius:2cqw;background:rgba(255,255,255,.055);margin-top:1.2cqw;font-size:2.5cqw}
 .scope input{width:4cqw;height:4cqw;accent-color:#70aaff;padding:0;margin:0}
 .scopeWrap{display:none;margin-top:3cqw}.scopeWrap.show{display:block}
+.clearScopeWrap{display:none;margin-top:3cqw;padding:2.5cqw;border:1px solid rgba(255,255,255,.18);border-radius:2.5cqw;background:rgba(255,255,255,.06)}.clearScopeWrap.show{display:block}
+.noteWindow{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;padding:5cqw 4cqw;border-radius:4cqw;background:rgba(24,39,63,.96);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}.noteWindow.show{display:flex}.noteWindowHead{display:flex;align-items:center;justify-content:space-between;gap:2cqw;padding-bottom:3cqw;border-bottom:1px solid var(--line)}.noteWindowHead h2{font-size:5cqw;overflow-wrap:anywhere}.noteWindowBody{flex:1;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:3cqw;line-height:1.65;padding:4cqw 1cqw}.noteWindowActions{display:flex;justify-content:flex-end;gap:2cqw;padding-top:2cqw}
 .digital{font-size:10cqw;font-weight:800;letter-spacing:.08em;text-align:center;font-variant-numeric:tabular-nums;padding:2cqw}
 input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-scheme:dark}
 #sheet{transform:translateZ(0);touch-action:pan-y;user-select:none;-webkit-user-select:none}
@@ -179,14 +181,14 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <div class="modalhead"><h2 id="modalTitle">Date</h2><button class="close" id="close">×</button></div>
 <div class="datebig" id="dateBig"></div><div class="countlabel" id="countLabel">Time remaining</div><div class="countdown" id="dateCountdown"></div><div class="countdownTables" aria-label="Countdown tables"><table class="countdownTable"><thead><tr><th>Day</th><th>Hour</th><th>Minute</th><th>Second</th></tr></thead><tbody><tr><td id="countDays">0</td><td id="countHours">0</td><td id="countMinutes">0</td><td id="countSeconds">0</td></tr></tbody></table><table class="countdownTable"><thead><tr><th>Year</th><th>Month</th><th>Day</th></tr></thead><tbody><tr><td id="yearsPart">0</td><td id="monthsPart">0</td><td id="daysPart">0</td></tr></tbody></table><table class="countdownTable"><thead><tr><th>Total Hours</th><th>Total Minutes</th><th>Total Seconds</th></tr></thead><tbody><tr><td id="totalHours">0</td><td id="totalMinutes">0</td><td id="totalSeconds">0</td></tr></tbody></table></div>
 <div class="eventline" id="eventLine" style="display:none"></div>
-<div class="actions"><button class="round" id="historyOpen" aria-label="Explore history for this date">▧</button><button class="round" id="add" aria-label="Add event">＋</button><button class="round" id="alarm" aria-label="Set alarm">◷</button></div>
+<div class="actions"><button class="round" id="historyOpen" aria-label="Explore history for this date">▧</button><button class="round" id="clearEvent" aria-label="Clear event" style="display:none">−</button><button class="round" id="add" aria-label="Add event">＋</button><button class="round" id="alarm" aria-label="Set alarm">◷</button></div>
 <div class="editor" id="editor"><label for="description">Event description</label><textarea id="description" placeholder="Write your event or reminder..."></textarea><button class="primary" id="eventOk">OK</button>
 <div class="scopeWrap" id="scopeWrap"><label>Repeat this event (choose one)</label>
 <label class="scope"><input type="radio" name="scope" value="month-year" checked> This month in this year</label>
 <label class="scope"><input type="radio" name="scope" value="all-months-year"> Every month in this year</label>
 <label class="scope"><input type="radio" name="scope" value="month-all-years"> This month in every year</label>
 <label class="scope"><input type="radio" name="scope" value="all-months-all-years"> Every month in every year</label>
-<button class="primary" id="saveEvent">Save event</button><button class="danger" id="deleteEvent">Remove event</button></div></div>
+<button class="primary" id="saveEvent">Save event</button></div><div class="clearScopeWrap" id="clearScopeWrap"><label>Clear event scope</label><label class="scope"><input type="radio" name="clearScope" value="once" checked> Once</label><label class="scope"><input type="radio" name="clearScope" value="all"> All</label><button class="danger" id="confirmClearEvent">Clear event</button><button class="secondary" id="cancelClearEvent">Cancel</button></div></div>
 <div class="alarmEditor" id="alarmEditor"><label for="alarmTime">Choose alarm time</label><div class="digital" id="digitalTime">09:00</div><input id="alarmTime" type="time" value="09:00"><button class="primary" id="saveAlarm">Set device alarm</button><button class="secondary" id="cancelAlarm">Cancel</button><div id="alarmStatus" class="datebig"></div></div>
 </section></div>
 <div class="historyOverlay" id="historyOverlay"><section class="historyPanel glass"><div class="historyHead"><div><h2>History Explorer</h2><p id="historyDate"></p></div><button class="close" id="historyClose">×</button></div><div class="historySummary" id="historySummary">Choose a date to explore its history.</div><div class="historyFilters" id="historyFilters"><button class="historyFilter active" data-kind="all">All</button><button class="historyFilter" data-kind="events">Events</button><button class="historyFilter" data-kind="births">Births</button><button class="historyFilter" data-kind="deaths">Deaths</button><button class="historyFilter" data-kind="holidays">Holidays</button><button class="historyFilter" data-kind="selected">Selected</button></div><div class="historyList" id="historyList" aria-live="polite"><div class="emptyState">Opening built-in history archive…</div></div><div class="historyFoot" id="historyFoot">Offline archive · Built into SED Calendar</div></section></div>
@@ -201,7 +203,7 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <button class="tile" id="languageToggle" data-page="homePage"><span>文A</span><span id="languageLabel">Language · বাংলা</span></button>
 </div><p class="emptyState" id="swipeHint">Swipe down to return to calendar</p></div>
 <div id="eventsPage" class="page"><div class="pageTitle">All events</div><div id="eventsList"></div></div>
-<div id="notesPage" class="page"><div class="pageTitle">Notebook</div><div id="noteEditor" class="noteEditor glass"><input id="noteTitle" placeholder="Note title"><textarea id="noteBody" placeholder="Write your note..."></textarea><button class="primary" id="saveNote">Save note</button><button class="secondary" id="cancelNote">Cancel</button></div><div id="notesList"></div><button class="pen" id="newNote" aria-label="New note">✎</button></div>
+<div id="notesPage" class="page"><div class="pageTitle">Notebook</div><div id="noteEditor" class="noteEditor glass"><input id="noteTitle" placeholder="Note title"><textarea id="noteBody" placeholder="Write your note..."></textarea><button class="primary" id="saveNote">Save note</button><button class="secondary" id="cancelNote">Cancel</button></div><div id="notesList"></div><button class="pen" id="newNote" aria-label="New note">✎</button></div><section class="noteWindow" id="noteWindow"><div class="noteWindowHead"><h2 id="noteViewTitle">Note</h2><button class="close" id="closeNoteView">×</button></div><div class="noteWindowBody" id="noteViewBody"></div><div class="noteWindowActions"><button class="secondary" id="editNoteView">Edit</button><button class="danger" id="deleteNoteView">Delete</button></div></section>
 <div id="settingsPage" class="page"><div class="pageTitle">Settings</div><div class="settingrow"><span>24-hour clock</span><input type="checkbox" id="format24"></div><div class="settingrow"><span>Glass intensity</span><input type="range" id="glassLevel" min="10" max="42" value="30"></div><p class="emptyState">Settings are saved on this device.</p></div>
 <div id="aboutPage" class="page"><div class="pageTitle">SED Calendar</div><div class="item"><strong>SED Calendar 1900–2100</strong><p>Calendar, recurring events, alarms and private notebook.</p></div></div>
 <div id="calculatorPage" class="page"><div class="pageTitle">Date calculator</div><div class="item"><label for="calcStart">From date</label><input id="calcStart" type="text" inputmode="numeric" placeholder="YYYY-MM-DD"><label for="calcEnd" style="margin-top:2.5cqw">To date</label><input id="calcEnd" type="text" inputmode="numeric" placeholder="YYYY-MM-DD"><button class="primary" id="calculateDates" style="width:100%">Calculate duration</button></div><div id="calcResult" class="item" aria-live="polite"><strong>Select two dates</strong><p>See the exact calendar difference in years, months and days.</p></div></div>
@@ -255,6 +257,7 @@ function keyFor(d){return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate(
 function normalizeEvent(v){return typeof v==='string'?{description:v,scope:'month-year'}:v;}
 function parts(ms){const sec=Math.max(0,Math.floor(Math.abs(ms)/1000)),days=Math.floor(sec/86400),hours=Math.floor(sec%86400/3600),mins=Math.floor(sec%3600/60),secs=sec%60;return days+'d  '+p(hours)+'h  '+p(mins)+'m  '+p(secs)+'s';}
 function eventApplies(base,record,target){
+ if(Array.isArray(record.excludedDates)&&record.excludedDates.includes(keyFor(target)))return false;
  const scope=record.scope||'month-year';
  if(scope==='month-year')return base.getFullYear()===target.getFullYear()&&base.getMonth()===target.getMonth()&&base.getDate()===target.getDate();
  if(scope==='all-months-year')return base.getFullYear()===target.getFullYear()&&base.getDate()===target.getDate();
@@ -297,7 +300,8 @@ function openDate(d){
  document.getElementById('modalTitle').textContent=q.day+' '+q.monthName+' '+q.year;
  document.getElementById('dateBig').innerHTML='<div class="calendarDateRow"><span>'+(uiLanguage==='bn'?'গ্রেগরিয়ান':'Gregorian')+'</span><strong>'+g.day+' '+g.monthName+' '+g.year+'</strong></div><div class="calendarDateRow"><span>'+(uiLanguage==='bn'?'হিজরি':'Hijri')+'</span><strong>'+h.day+' '+h.monthName+' '+h.year+'</strong></div><div class="calendarDateRow"><span>'+(uiLanguage==='bn'?'বাংলা':'Bangla')+'</span><strong>'+b.day+' '+b.monthName+' '+b.year+'</strong></div><div class="calendarDateNote">'+(uiLanguage==='bn'?'হিজরি তারিখ উম্মুল কুরা পদ্ধতিতে গণনা করা; বাংলাদেশে চাঁদ দেখার কারণে এক দিন পার্থক্য হতে পারে।':'Hijri date uses the Umm al-Qura calculation and may differ from Bangladesh moon-sighting by one day.')+'</div>';
  document.getElementById('description').value=own&&own.description?own.description:'';
- document.getElementById('editor').classList.remove('show');document.getElementById('scopeWrap').classList.remove('show');
+ document.getElementById('clearEvent').style.display=matches.length?'grid':'none';
+ document.getElementById('editor').classList.remove('show');document.getElementById('scopeWrap').classList.remove('show');document.getElementById('clearScopeWrap').classList.remove('show');
  document.getElementById('alarmEditor').classList.remove('show');document.querySelector('input[name="scope"][value="month-year"]').checked=true;
  const line=document.getElementById('eventLine');if(matches.length){line.textContent=matches.map(x=>x.record.description).join('\n');line.style.display='block';}else{line.style.display='none';}
  updateDateCountdown();document.getElementById('overlay').classList.add('show');
@@ -407,7 +411,21 @@ document.getElementById('saveEvent').addEventListener('click',()=>{
  localStorage.setItem('sedCalendarEvents',JSON.stringify(events));document.getElementById('editor').classList.remove('show');document.getElementById('scopeWrap').classList.remove('show');
  const line=document.getElementById('eventLine');line.textContent=eventsForDate(selectedDate).map(x=>x.record.description).join('\n');line.style.display='block';renderYear();
 });
-document.getElementById('deleteEvent').addEventListener('click',()=>{if(!selectedDate)return;delete events[keyFor(selectedDate)];localStorage.setItem('sedCalendarEvents',JSON.stringify(events));document.getElementById('description').value='';document.getElementById('eventLine').style.display='none';document.getElementById('editor').classList.remove('show');document.getElementById('scopeWrap').classList.remove('show');renderYear();});
+document.getElementById('clearEvent').addEventListener('click',()=>{if(!selectedDate||!eventsForDate(selectedDate).length)return;document.getElementById('alarmEditor').classList.remove('show');document.getElementById('editor').classList.add('show');document.getElementById('scopeWrap').classList.remove('show');document.getElementById('clearScopeWrap').classList.add('show');});
+document.getElementById('cancelClearEvent').addEventListener('click',()=>document.getElementById('clearScopeWrap').classList.remove('show'));
+document.getElementById('confirmClearEvent').addEventListener('click',()=>{
+ if(!selectedDate)return;
+ const matches=eventsForDate(selectedDate),mode=document.querySelector('input[name="clearScope"]:checked').value,targetKey=keyFor(selectedDate);
+ matches.forEach(({key,record})=>{
+  if(mode==='all'||(record.scope||'month-year')==='month-year')delete events[key];
+  else{record.excludedDates=Array.isArray(record.excludedDates)?record.excludedDates:[];if(!record.excludedDates.includes(targetKey))record.excludedDates.push(targetKey);events[key]=record;}
+ });
+ localStorage.setItem('sedCalendarEvents',JSON.stringify(events));
+ const remaining=eventsForDate(selectedDate),line=document.getElementById('eventLine');
+ line.textContent=remaining.map(x=>x.record.description).join('\\n');line.style.display=remaining.length?'block':'none';
+ document.getElementById('clearEvent').style.display=remaining.length?'grid':'none';
+ document.getElementById('description').value='';document.getElementById('editor').classList.remove('show');document.getElementById('scopeWrap').classList.remove('show');document.getElementById('clearScopeWrap').classList.remove('show');renderYear();
+});
 document.getElementById('alarm').addEventListener('click',()=>{document.getElementById('editor').classList.remove('show');document.getElementById('alarmEditor').classList.toggle('show');document.getElementById('alarmStatus').textContent='';});
 document.getElementById('alarmTime').addEventListener('input',e=>{document.getElementById('digitalTime').textContent=e.target.value||'--:--';});
 document.getElementById('saveAlarm').addEventListener('click',()=>{
@@ -439,8 +457,14 @@ function persistNotes(){localStorage.setItem('sedCalendarNotes',JSON.stringify(n
 function renderNotes(){
  const list=document.getElementById('notesList');list.innerHTML='';
  if(!notes.length){list.innerHTML='<div class="emptyState">Your notebook is empty. Tap the pen to write a note.</div>';return;}
- notes.slice().sort((a,b)=>b.updated-a.updated).forEach(n=>{const el=document.createElement('button');el.className='item';el.style.width='100%';el.style.textAlign='left';el.innerHTML='<strong></strong><small></small><p></p>';el.querySelector('strong').textContent=n.title||'Untitled note';el.querySelector('small').textContent=new Date(n.updated).toLocaleString();el.querySelector('p').textContent=n.body;el.addEventListener('click',()=>editNote(n.id));list.appendChild(el);});
+ notes.slice().sort((a,b)=>b.updated-a.updated).forEach(n=>{const el=document.createElement('button');el.className='item';el.style.width='100%';el.style.textAlign='left';el.innerHTML='<strong></strong>';el.querySelector('strong').textContent=n.title||'Untitled note';el.addEventListener('click',()=>openNoteView(n.id));list.appendChild(el);});
 }
+let viewingNoteId=null;
+function openNoteView(id){const n=notes.find(x=>x.id===id);if(!n)return;viewingNoteId=id;document.getElementById('noteViewTitle').textContent=n.title||'Untitled note';document.getElementById('noteViewBody').textContent=n.body||'';document.getElementById('noteWindow').classList.add('show');}
+function closeNoteView(){document.getElementById('noteWindow').classList.remove('show');viewingNoteId=null;}
+document.getElementById('closeNoteView').addEventListener('click',closeNoteView);
+document.getElementById('editNoteView').addEventListener('click',()=>{if(!viewingNoteId)return;const id=viewingNoteId;closeNoteView();editNote(id);});
+document.getElementById('deleteNoteView').addEventListener('click',()=>{if(!viewingNoteId)return;const id=viewingNoteId;if(!confirm('Delete this note?'))return;notes=notes.filter(n=>n.id!==id);persistNotes();closeNoteView();renderNotes();});
 function editNote(id){const n=notes.find(x=>x.id===id);if(!n)return;editingNoteId=id;document.getElementById('noteTitle').value=n.title;document.getElementById('noteBody').value=n.body;document.getElementById('noteEditor').classList.add('show');}
 document.getElementById('newNote').addEventListener('click',()=>{editingNoteId=null;document.getElementById('noteTitle').value='';document.getElementById('noteBody').value='';document.getElementById('noteEditor').classList.add('show');document.getElementById('noteTitle').focus();});
 document.getElementById('cancelNote').addEventListener('click',()=>document.getElementById('noteEditor').classList.remove('show'));
