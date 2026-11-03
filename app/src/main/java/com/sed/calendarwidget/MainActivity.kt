@@ -22,6 +22,8 @@ import android.widget.Toast
 
 class MainActivity : Activity() {
     private var calendarWebView: WebView? = null
+    private var pageReady = false
+    private var queuedWidgetPage: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -63,7 +65,9 @@ class MainActivity : Activity() {
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView, url: String) {
                     super.onPageFinished(view, url)
-                    val page = intent.getStringExtra("widget_page")
+                    pageReady = true
+                    val page = queuedWidgetPage ?: intent.getStringExtra("widget_page")
+                    queuedWidgetPage = null
                     if (!page.isNullOrBlank()) view.evaluateJavascript("openWidgetPage('$page')", null)
                     WeatherService.refresh(this@MainActivity) { json ->
                         runOnUiThread { view.evaluateJavascript("updateWeather($json)", null) }
@@ -82,7 +86,10 @@ class MainActivity : Activity() {
         super.onNewIntent(intent)
         setIntent(intent)
         val page = intent.getStringExtra("widget_page")
-        if (!page.isNullOrBlank()) calendarWebView?.evaluateJavascript("openWidgetPage('$page')", null)
+        if (!page.isNullOrBlank()) {
+            if (pageReady && calendarWebView != null) calendarWebView?.evaluateJavascript("openWidgetPage('$page')", null)
+            else queuedWidgetPage = page
+        }
         if (page == "weather") WeatherService.refresh(this) { json ->
             runOnUiThread { calendarWebView?.evaluateJavascript("updateWeather($json)", null) }
         }
