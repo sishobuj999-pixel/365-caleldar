@@ -57,12 +57,14 @@ open class CalendarWidgetProvider : AppWidgetProvider() {
             )
             val weather = runCatching { org.json.JSONObject(context.getSharedPreferences("sed_weather", Context.MODE_PRIVATE).getString("weather_json", "{}") ?: "{}") }.getOrNull()
             val temperature = weather?.optDouble("temperature", Double.NaN) ?: Double.NaN
-            views.setTextViewText(R.id.widget_shortcut_weather, if (temperature.isFinite()) "☀ ${temperature.toInt()}° · Weather" else "☀ Weather")
+            val description = weather?.optString("description", "Weather") ?: "Weather"
+            views.setTextViewText(R.id.widget_weather_temp, if (temperature.isFinite()) "${temperature.toInt()}°" else "--°")
+            views.setTextViewText(R.id.widget_weather_desc, description)
             views.setOnClickPendingIntent(R.id.widget_root, pi)
-            views.setOnClickPendingIntent(R.id.widget_shortcut_date, WidgetNavigation.pending(context, "date", id * 10 + 1))
-            views.setOnClickPendingIntent(R.id.widget_shortcut_weather, WidgetNavigation.pending(context, "weather", id * 10 + 2))
-            views.setOnClickPendingIntent(R.id.widget_shortcut_time, WidgetNavigation.pending(context, "time", id * 10 + 3))
-            views.setOnClickPendingIntent(R.id.widget_clock, WidgetNavigation.pending(context, "time", id * 10 + 4))
+            views.setOnClickPendingIntent(R.id.widget_date, WidgetNavigation.pending(context, "date", id * 10 + 1))
+            views.setOnClickPendingIntent(R.id.widget_year, WidgetNavigation.pending(context, "date", id * 10 + 2))
+            views.setOnClickPendingIntent(R.id.widget_clock, WidgetNavigation.pending(context, "time", id * 10 + 3))
+            views.setOnClickPendingIntent(R.id.widget_weather_panel, WidgetNavigation.pending(context, "weather", id * 10 + 4))
             manager.updateAppWidget(id, views)
         }
     }
@@ -98,15 +100,15 @@ open class AdvancedCalendarWidgetProvider:AppWidgetProvider(){
    if(style==0)v.setTextViewTextSize(R.id.widget_clock,android.util.TypedValue.COMPLEX_UNIT_SP,27f);if(style==8)v.setTextViewTextSize(R.id.widget_days,android.util.TypedValue.COMPLEX_UNIT_SP,42f)
    val weather=runCatching{org.json.JSONObject(context.getSharedPreferences("sed_weather",Context.MODE_PRIVATE).getString("weather_json","{}")?: "{}")}.getOrNull()
    val temp=weather?.optDouble("temperature",Double.NaN)?:Double.NaN
-   val weatherLabel=if(temp.isFinite()) "☀ ${temp.toInt()}° · Weather" else "☀ Weather"
-   v.setTextViewText(R.id.widget_shortcut_weather,weatherLabel)
+   val description=weather?.optString("description","Weather")?:"Weather"
+   v.setTextViewText(R.id.widget_weather_temp,if(temp.isFinite()) "${temp.toInt()}°" else "--°")
+   v.setTextViewText(R.id.widget_weather_desc,description)
    val pi=PendingIntent.getActivity(context,style,Intent(context,MainActivity::class.java),PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
    v.setOnClickPendingIntent(R.id.widget_root,pi)
-   v.setOnClickPendingIntent(R.id.widget_shortcut_date,WidgetNavigation.pending(context,"date",id*10+1))
-   v.setOnClickPendingIntent(R.id.widget_shortcut_weather,WidgetNavigation.pending(context,"weather",id*10+2))
-   v.setOnClickPendingIntent(R.id.widget_shortcut_time,WidgetNavigation.pending(context,"time",id*10+3))
-   v.setOnClickPendingIntent(R.id.widget_clock,WidgetNavigation.pending(context,"time",id*10+4))
-   v.setOnClickPendingIntent(R.id.widget_date,WidgetNavigation.pending(context,"date",id*10+5))
+   v.setOnClickPendingIntent(R.id.widget_clock,WidgetNavigation.pending(context,"time",id*10+1))
+   v.setOnClickPendingIntent(R.id.widget_date,WidgetNavigation.pending(context,"date",id*10+2))
+   v.setOnClickPendingIntent(R.id.widget_year,WidgetNavigation.pending(context,"date",id*10+3))
+   v.setOnClickPendingIntent(R.id.widget_weather_panel,WidgetNavigation.pending(context,"weather",id*10+4))
    manager.updateAppWidget(id,v)
   }
  }
