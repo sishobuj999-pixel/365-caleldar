@@ -226,7 +226,7 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 .noteEditor.show{display:block}
 .noteEditor input{margin-bottom:2cqw}
 .pen{position:absolute;right:5cqw;bottom:5cqw;width:13cqw;height:13cqw;border-radius:50%;font-size:6cqw;background:rgba(59,130,246,.82);border:1px solid rgba(255,255,255,.35);box-shadow:0 8px 22px rgba(0,0,0,.25)}
-.settingrow{display:flex;justify-content:space-between;align-items:center;padding:3cqw 0;border-bottom:1px solid var(--line);font-size:3cqw}
+.settingrow{display:flex;justify-content:space-between;align-items:center;padding:3cqw 0;border-bottom:1px solid var(--line);font-size:3cqw}.weatherHero{text-align:center;padding:5cqw}.weatherHero strong{font-size:4cqw}.weatherHero small{display:block;margin-top:1.5cqw}.weatherStats{grid-template-columns:repeat(2,minmax(0,1fr));gap:2cqw}.weatherStats .item{margin:0;text-align:center}.weatherStats .item strong{font-size:4cqw}.weatherStats .item small{font-size:2.4cqw;color:rgba(255,255,255,.65)}#worldClocks .item{display:flex;justify-content:space-between;align-items:center}#worldClocks .item p{font-size:3.2cqw;font-weight:700;font-variant-numeric:tabular-nums}
 .settingrow input{width:5cqw;height:5cqw}
 @media(prefers-reduced-transparency:reduce){.sheet,.modal,#hub{background:rgba(20,30,49,.96)}}
 </style></head><body><main class="sheet" id="sheet">
@@ -250,7 +250,10 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <div class="historyOverlay" id="historyOverlay"><section class="historyPanel glass"><div class="historyHead"><div><h2>History Explorer</h2><p id="historyDate"></p></div><button class="close" id="historyClose">×</button></div><div class="historySummary" id="historySummary">Choose a date to explore its history.</div><div class="historyFilters" id="historyFilters"><button class="historyFilter active" data-kind="all">All</button><button class="historyFilter" data-kind="events">Events</button><button class="historyFilter" data-kind="births">Births</button><button class="historyFilter" data-kind="deaths">Deaths</button><button class="historyFilter" data-kind="holidays">Holidays</button><button class="historyFilter" data-kind="selected">Selected</button></div><div class="historyList" id="historyList" aria-live="polite"><div class="emptyState">Opening built-in history archive…</div></div><div class="historyFoot" id="historyFoot">Offline archive · Built into SED Calendar</div></section></div>
 <section id="hub" class="glass">
 <div class="hubhead"><h2 id="hubTitle">Calendar tools</h2><button class="close" id="hubBack">×</button></div>
-<div id="homePage" class="page active"><div class="hubgrid">
+<div id="homePage" class="page active"><div class="hubgrid"><button class="tile" id="calendarShortcut"><span>▦</span>Date · Calendar</button>
+<button class="tile" data-page="weatherPage"><span>☀</span>Weather</button>
+<button class="tile" data-page="timePage"><span>◷</span>Time · World clock · Timer</button>
+
 <button class="tile" data-page="eventsPage"><span>▦</span>Events</button>
 <button class="tile" data-page="notesPage"><span>▤</span>Notes</button>
 <button class="tile" data-page="settingsPage"><span>⚙</span>Settings</button>
@@ -261,6 +264,34 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
 <div id="eventsPage" class="page"><div class="pageTitle">All events</div><div id="eventsList"></div></div>
 <div id="notesPage" class="page"><div class="pageTitle">Notebook</div><div id="noteEditor" class="noteEditor glass"><input id="noteTitle" placeholder="Note title"><textarea id="noteBody" placeholder="Write your note..."></textarea><button class="primary" id="saveNote">Save note</button><button class="secondary" id="cancelNote">Cancel</button></div><div id="notesList"></div><button class="pen" id="newNote" aria-label="New note">✎</button></div><section class="noteWindow" id="noteWindow"><div class="noteWindowHead"><h2 id="noteViewTitle">Note</h2><button class="close" id="closeNoteView">×</button></div><div class="noteWindowBody" id="noteViewBody"></div><div class="noteWindowActions"><button class="secondary" id="editNoteView">Edit</button><button class="danger" id="deleteNoteView">Delete</button></div></section>
 <div id="settingsPage" class="page"><div class="pageTitle">Settings</div><div class="settingrow"><span>24-hour clock</span><input type="checkbox" id="format24"></div><div class="settingrow"><span>Glass intensity</span><input type="range" id="glassLevel" min="10" max="42" value="30"></div><p class="emptyState">Settings are saved on this device.</p></div>
+<div id="weatherPage" class="page">
+ <div class="pageTitle">Weather · Current location</div>
+ <div class="item weatherHero"><div id="weatherIcon" style="font-size:15cqw">☁</div><div id="weatherTemp" style="font-size:12cqw;font-weight:800">--°</div><strong id="weatherDesc">Getting your local weather…</strong><small id="weatherLocation">Using GPS location</small></div>
+ <div class="hubgrid weatherStats">
+  <div class="item"><small>Feels like</small><strong id="weatherFeels">--°</strong></div>
+  <div class="item"><small>Today · High / Low</small><strong id="weatherHighLow">--° / --°</strong></div>
+  <div class="item"><small>Humidity</small><strong id="weatherHumidity">--%</strong></div>
+  <div class="item"><small>Wind</small><strong id="weatherWind">-- km/h</strong></div>
+  <div class="item"><small>Rain chance</small><strong id="weatherRain">--%</strong></div>
+  <div class="item"><small>Precipitation</small><strong id="weatherPrecip">-- mm</strong></div>
+ </div>
+ <button class="primary" id="refreshWeather" style="width:100%">Refresh GPS weather</button><p class="emptyState" id="weatherUpdated">Weather data by Open-Meteo</p>
+ </div>
+<div id="timePage" class="page">
+ <div class="pageTitle">Time centre</div>
+ <div class="item"><small>Local time</small><strong id="localClock" style="font-size:9cqw">--:--:--</strong><p id="localDate"></p></div>
+ <div class="pageTitle">World time</div>
+ <div id="worldClocks">
+  <div class="item"><strong>Dhaka</strong><p data-zone="Asia/Dhaka">--:--</p></div>
+  <div class="item"><strong>London</strong><p data-zone="Europe/London">--:--</p></div>
+  <div class="item"><strong>New York</strong><p data-zone="America/New_York">--:--</p></div>
+  <div class="item"><strong>Tokyo</strong><p data-zone="Asia/Tokyo">--:--</p></div>
+  <div class="item"><strong>Dubai</strong><p data-zone="Asia/Dubai">--:--</p></div>
+ </div>
+ <div class="pageTitle">Timer</div>
+ <div class="item"><label for="timerMinutes">Duration (minutes)</label><input id="timerMinutes" type="number" min="1" max="999" value="5"><strong id="timerDisplay" style="display:block;text-align:center;font-size:10cqw;margin:3cqw 0">05:00</strong>
+ <div style="display:flex;gap:2cqw"><button class="primary" id="timerStart" style="flex:1">Start</button><button class="secondary" id="timerPause" style="flex:1">Pause</button><button class="secondary" id="timerReset" style="flex:1">Reset</button></div></div>
+</div>
 <div id="aboutPage" class="page"><div class="pageTitle">SED Calendar</div><div class="item"><strong>SED Calendar 1900–2100</strong><p>Calendar, recurring events, alarms and private notebook.</p></div></div>
 <div id="calculatorPage" class="page"><div class="pageTitle">Date calculator</div><div class="item"><label for="calcStart">From date</label><input id="calcStart" type="text" inputmode="numeric" placeholder="YYYY-MM-DD"><label for="calcEnd" style="margin-top:2.5cqw">To date</label><input id="calcEnd" type="text" inputmode="numeric" placeholder="YYYY-MM-DD"><button class="primary" id="calculateDates" style="width:100%">Calculate duration</button></div><div id="calcResult" class="item" aria-live="polite"><strong>Select two dates</strong><p>See the exact calendar difference in years, months and days.</p></div></div>
 </section></main>
@@ -496,8 +527,8 @@ function closeModal(){document.getElementById('overlay').classList.remove('show'
 document.getElementById('close').addEventListener('click',closeModal);document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
 function showHub(page){document.getElementById('hub').classList.add('show');showPage(page||'homePage');}
 function hideHub(){document.getElementById('hub').classList.remove('show');}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.getElementById('hubTitle').textContent=localizeText(({homePage:'Calendar tools',eventsPage:'Events',notesPage:'Notes',settingsPage:'Settings',aboutPage:'About',calculatorPage:'Date calculator'})[id]||'Calendar tools');if(id==='eventsPage')renderEvents();if(id==='notesPage')renderNotes();if(id==='calculatorPage')initDateCalculator();translateVisibleUI(document.getElementById(id));}
-document.querySelectorAll('.tile').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));document.getElementById('languageToggle').addEventListener('click',()=>setLanguage(uiLanguage==='bn'?'en':'bn'));
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.getElementById('hubTitle').textContent=localizeText(({homePage:'Calendar tools',eventsPage:'Events',notesPage:'Notes',settingsPage:'Settings',aboutPage:'About',calculatorPage:'Date calculator',weatherPage:'Weather',timePage:'Time centre'})[id]||'Calendar tools');if(id==='eventsPage')renderEvents();if(id==='notesPage')renderNotes();if(id==='calculatorPage')initDateCalculator();if(id==='weatherPage'&&window.AndroidWeather)window.AndroidWeather.refreshWeather();if(id==='timePage')updateTimeCentre();translateVisibleUI(document.getElementById(id));}
+document.querySelectorAll('.tile').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));document.getElementById('calendarShortcut').addEventListener('click',hideHub);document.getElementById('languageToggle').addEventListener('click',()=>setLanguage(uiLanguage==='bn'?'en':'bn'));
 document.getElementById('hubBack').addEventListener('click',()=>{if(!document.getElementById('homePage').classList.contains('active'))showPage('homePage');else hideHub();});
 function renderEvents(){
  const list=document.getElementById('eventsList');list.innerHTML='';const keys=Object.keys(events).sort();
@@ -615,6 +646,25 @@ hub.addEventListener('touchcancel',()=>finishDrag('hub'),{passive:true});
 showHub=function(page){showPage(page||'homePage');settleHub(true);};
 hideHub=function(){settleHub(false);};
 document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')changeYear(-1);if(e.key==='ArrowRight')changeYear(1);if(e.key==='Escape'){closeModal();hideHub();}});
+function openWidgetPage(page){if(page==='date'||page==='calendar'){hideHub();return;}if(page==='weather'||page==='weatherPage'){showHub('weatherPage');return;}if(page==='time'||page==='timePage'){showHub('timePage');return;}showHub('homePage');}
+function updateWeather(data){
+ if(!data)return;const err=data.error;if(err){document.getElementById('weatherDesc').textContent=err;return;}
+ const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+ put('weatherTemp',Math.round(data.temperature)+'°C');put('weatherDesc',data.description||'Current conditions');put('weatherFeels',Math.round(data.feelsLike)+'°C');put('weatherHighLow',Math.round(data.high)+'° / '+Math.round(data.low)+'°');put('weatherHumidity',data.humidity+'%');put('weatherWind',Math.round(data.wind)+' km/h');put('weatherRain',data.rainChance+'%');put('weatherPrecip',data.precipitation+' mm');put('weatherLocation','GPS · '+Number(data.latitude).toFixed(2)+', '+Number(data.longitude).toFixed(2));put('weatherIcon',data.code===0?'☀':([1,2,3].includes(data.code)?'⛅':([61,63,65,80,81,82].includes(data.code)?'🌧':([95,96,99].includes(data.code)?'⛈':'☁'))));put('weatherUpdated','Updated '+new Date(data.updatedAt).toLocaleTimeString());
+}
+function updateTimeCentre(){
+ const now=new Date(),clock=document.getElementById('localClock');if(clock)clock.textContent=now.toLocaleTimeString();const date=document.getElementById('localDate');if(date)date.textContent=now.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ document.querySelectorAll('#worldClocks [data-zone]').forEach(el=>{try{el.textContent=new Intl.DateTimeFormat(undefined,{timeZone:el.dataset.zone,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).format(now);}catch(e){}});
+}
+let timerRemaining=0,timerEnd=0,timerHandle=null;
+function paintTimer(){const el=document.getElementById('timerDisplay');if(!el)return;const n=Math.max(0,Math.ceil(timerRemaining/1000));el.textContent=String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0');}
+function timerTick(){timerRemaining=Math.max(0,timerEnd-Date.now());paintTimer();if(timerRemaining<=0){clearInterval(timerHandle);timerHandle=null;document.getElementById('timerDisplay').textContent='00:00 · Finished';}}
+document.getElementById('refreshWeather').addEventListener('click',()=>{document.getElementById('weatherDesc').textContent='Updating from GPS…';if(window.AndroidWeather)window.AndroidWeather.refreshWeather();});
+document.getElementById('timerStart').addEventListener('click',()=>{if(timerHandle)return;if(timerRemaining<=0)timerRemaining=Math.max(1,Number(document.getElementById('timerMinutes').value)||1)*60000;timerEnd=Date.now()+timerRemaining;timerHandle=setInterval(timerTick,250);});
+document.getElementById('timerPause').addEventListener('click',()=>{if(timerHandle){timerRemaining=Math.max(0,timerEnd-Date.now());clearInterval(timerHandle);timerHandle=null;paintTimer();}});
+document.getElementById('timerReset').addEventListener('click',()=>{if(timerHandle)clearInterval(timerHandle);timerHandle=null;timerRemaining=Math.max(1,Number(document.getElementById('timerMinutes').value)||1)*60000;paintTimer();});
+document.getElementById('timerMinutes').addEventListener('change',()=>{if(!timerHandle){timerRemaining=Math.max(1,Number(document.getElementById('timerMinutes').value)||1)*60000;paintTimer();}});
+setInterval(updateTimeCentre,1000);setInterval(()=>{if(timerHandle)timerTick();},250);updateTimeCentre();timerRemaining=300000;paintTimer();
 renderYear();if(uiLanguage==='bn')setLanguage('bn');setInterval(()=>{updateHeader();updateDateCountdown();},1000);
 const layerObserver=new MutationObserver(()=>{const active=sheet.querySelector('.overlay.show,.historyOverlay.show,.noteWindow.show,#hub.show');sheet.classList.toggle('modal-open',!!active);});layerObserver.observe(sheet,{subtree:true,attributes:true,attributeFilter:['class']});</script></body></html>
     """.trimIndent()
