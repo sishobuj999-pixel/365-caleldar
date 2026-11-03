@@ -277,6 +277,20 @@ input[type=time]{font-size:5cqw;letter-spacing:.12em;text-align:center;color-sch
  </div>
  <button class="primary" id="refreshWeather" style="width:100%">Refresh GPS weather</button><p class="emptyState" id="weatherUpdated">Weather data by Open-Meteo</p>
  </div>
+<div id="countdownPage" class="page">
+ <div class="pageTitle">Year countdown</div>
+ <div class="item"><small>Time remaining until next year</small><strong id="detailCountdown" style="font-size:11cqw">--:--:--:--</strong><p>Days : Hours : Minutes : Seconds</p></div>
+ <div class="item"><small>Exact remaining time</small><strong id="detailCountdownLong">Calculating…</strong></div>
+</div>
+<div id="progressPage" class="page">
+ <div class="pageTitle">Year progress</div>
+ <div class="item"><small>Year completed</small><strong id="detailYearPercent" style="font-size:16cqw">--%</strong><div style="height:2cqw;background:rgba(255,255,255,.15);border-radius:9cqw;overflow:hidden"><div id="detailYearBar" style="height:100%;width:0;background:#bdf7d8"></div></div><p id="detailYearDays"></p></div>
+</div>
+<div id="yearInfoPage" class="page">
+ <div class="pageTitle">Calendar details</div>
+ <div class="item"><small>Today</small><strong id="detailToday"></strong><p id="detailWeek"></p></div>
+ <div class="item"><small>Day of year</small><strong id="detailDayOfYear"></strong><p id="detailDaysRemain"></p></div>
+</div>
 <div id="timePage" class="page">
  <div class="pageTitle">Time centre</div>
  <div class="item"><small>Local time</small><strong id="localClock" style="font-size:9cqw">--:--:--</strong><p id="localDate"></p></div>
@@ -527,7 +541,7 @@ function closeModal(){document.getElementById('overlay').classList.remove('show'
 document.getElementById('close').addEventListener('click',closeModal);document.getElementById('overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal();});
 function showHub(page){document.getElementById('hub').classList.add('show');showPage(page||'homePage');}
 function hideHub(){document.getElementById('hub').classList.remove('show');}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.getElementById('hubTitle').textContent=localizeText(({homePage:'Calendar tools',eventsPage:'Events',notesPage:'Notes',settingsPage:'Settings',aboutPage:'About',calculatorPage:'Date calculator',weatherPage:'Weather',timePage:'Time centre'})[id]||'Calendar tools');if(id==='eventsPage')renderEvents();if(id==='notesPage')renderNotes();if(id==='calculatorPage')initDateCalculator();if(id==='weatherPage'&&window.AndroidWeather)window.AndroidWeather.refreshWeather();if(id==='timePage')updateTimeCentre();translateVisibleUI(document.getElementById(id));}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.getElementById('hubTitle').textContent=localizeText(({homePage:'Calendar tools',eventsPage:'Events',notesPage:'Notes',settingsPage:'Settings',aboutPage:'About',calculatorPage:'Date calculator',weatherPage:'Weather',timePage:'Time centre',countdownPage:'Year countdown',progressPage:'Year progress',yearInfoPage:'Calendar details'})[id]||'Calendar tools');if(id==='eventsPage')renderEvents();if(id==='notesPage')renderNotes();if(id==='calculatorPage')initDateCalculator();if(id==='weatherPage'&&window.AndroidWeather)window.AndroidWeather.refreshWeather();if(id==='timePage')updateTimeCentre();translateVisibleUI(document.getElementById(id));}
 document.querySelectorAll('.tile').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));document.getElementById('calendarShortcut').addEventListener('click',hideHub);document.getElementById('languageToggle').addEventListener('click',()=>setLanguage(uiLanguage==='bn'?'en':'bn'));
 document.getElementById('hubBack').addEventListener('click',()=>{if(!document.getElementById('homePage').classList.contains('active'))showPage('homePage');else hideHub();});
 function renderEvents(){
@@ -646,12 +660,21 @@ hub.addEventListener('touchcancel',()=>finishDrag('hub'),{passive:true});
 showHub=function(page){showPage(page||'homePage');settleHub(true);};
 hideHub=function(){settleHub(false);};
 document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')changeYear(-1);if(e.key==='ArrowRight')changeYear(1);if(e.key==='Escape'){closeModal();hideHub();}});
-function openWidgetPage(page){if(page==='date'||page==='calendar'){hideHub();return;}if(page==='weather'||page==='weatherPage'){showHub('weatherPage');return;}if(page==='time'||page==='timePage'){showHub('timePage');return;}showHub('homePage');}
+function openWidgetPage(page){if(page==='date'||page==='calendar'){hideHub();return;}if(page==='weather'||page==='weatherPage'){showHub('weatherPage');return;}if(page==='time'||page==='timePage'){showHub('timePage');return;}if(page==='countdown'){showHub('countdownPage');return;}if(page==='progress'){showHub('progressPage');return;}if(page==='yearInfo'){showHub('yearInfoPage');return;}showHub('homePage');}
 function updateWeather(data){
  if(!data)return;const err=data.error;if(err){document.getElementById('weatherDesc').textContent=err;return;}
  const put=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
  put('weatherTemp',Math.round(data.temperature)+'°C');put('weatherDesc',data.description||'Current conditions');put('weatherFeels',Math.round(data.feelsLike)+'°C');put('weatherHighLow',Math.round(data.high)+'° / '+Math.round(data.low)+'°');put('weatherHumidity',data.humidity+'%');put('weatherWind',Math.round(data.wind)+' km/h');put('weatherRain',data.rainChance+'%');put('weatherPrecip',data.precipitation+' mm');put('weatherLocation','GPS · '+Number(data.latitude).toFixed(2)+', '+Number(data.longitude).toFixed(2));put('weatherIcon',data.code===0?'☀':([1,2,3].includes(data.code)?'⛅':([61,63,65,80,81,82].includes(data.code)?'🌧':([95,96,99].includes(data.code)?'⛈':'☁'))));put('weatherUpdated','Updated '+new Date(data.updatedAt).toLocaleTimeString());
 }
+function updateWidgetDetails(){
+ const now=new Date(),start=new Date(now.getFullYear(),0,1),end=new Date(now.getFullYear()+1,0,1),left=Math.max(0,end-now),total=end-start,elapsed=now-start,pct=Math.min(100,Math.max(0,elapsed/total*100));
+ const sec=Math.floor(left/1000),days=Math.floor(sec/86400),hours=Math.floor(sec%86400/3600),mins=Math.floor(sec%3600/60),seconds=sec%60;
+ const put=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+ put('detailCountdown',[days,hours,mins,seconds].map(v=>String(v).padStart(2,'0')).join(':'));put('detailCountdownLong',days+' days, '+hours+' hours, '+mins+' minutes and '+seconds+' seconds remaining');
+ put('detailYearPercent',pct.toFixed(2)+'%');const bar=document.getElementById('detailYearBar');if(bar)bar.style.width=pct+'%';put('detailYearDays',Math.floor(elapsed/86400000)+' days elapsed · '+Math.ceil(left/86400000)+' days remaining');
+ put('detailToday',now.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'}));put('detailWeek','Week '+Math.ceil((Math.floor(elapsed/86400000)+start.getDay()+1)/7));put('detailDayOfYear',Math.floor(elapsed/86400000)+1+' / '+Math.round(total/86400000));put('detailDaysRemain',Math.ceil(left/86400000)+' days until next year');
+}
+setInterval(updateWidgetDetails,1000);updateWidgetDetails();
 function updateTimeCentre(){
  const now=new Date(),clock=document.getElementById('localClock');if(clock)clock.textContent=now.toLocaleTimeString();const date=document.getElementById('localDate');if(date)date.textContent=now.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
  document.querySelectorAll('#worldClocks [data-zone]').forEach(el=>{try{el.textContent=new Intl.DateTimeFormat(undefined,{timeZone:el.dataset.zone,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).format(now);}catch(e){}});
