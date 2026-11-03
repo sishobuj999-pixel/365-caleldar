@@ -29,9 +29,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="v1.8.0"
+          TAG="v1.8.1"
           if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
             gh release upload "$TAG" app/build/outputs/apk/debug/app-debug.apk --repo "${{ github.repository }}" --clobber
           else
-            gh release create "$TAG" app/build/outputs/apk/debug/app-debug.apk --repo "${{ github.repository }}" --title "SED Calendar 2026 v1.8.0" --notes "GPS-based automatic local weather, Weather and Time Centre pages, and Date/Weather/Time widget shortcuts with world clocks and timer."
+            gh release create "$TAG" app/build/outputs/apk/debug/app-debug.apk --repo "${{ github.repository }}" --title "SED Calendar 2026 v1.8.1" --notes "Widget information now opens individual detail pages; weather is larger beside the clock; popup glass is translucent with background blur."
           fi
