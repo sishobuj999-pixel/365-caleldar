@@ -15,7 +15,19 @@
         <receiver android:name=".AlarmReceiver" android:exported="false">
             <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED"/></intent-filter>
         </receiver>
-        <receiver android:name=".CalendarWidgetProvider" android:exported="true">
+        <receiver android:name=".CalendarWidgetProvider" android:label="SED Calendar · Glass" android:exported="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/calendar_widget_info"/>
+        </receiver>
+        <receiver android:name=".WaterCalendarWidgetProvider" android:label="SED Calendar · Water" android:exported="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/calendar_widget_info"/>
+        </receiver>
+        <receiver android:name=".BlurCalendarWidgetProvider" android:label="SED Calendar · Frosted" android:exported="true">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/calendar_widget_info"/>
+        </receiver>
+        <receiver android:name=".TransparentCalendarWidgetProvider" android:label="SED Calendar · Transparent" android:exported="true">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/calendar_widget_info"/>
         </receiver>
