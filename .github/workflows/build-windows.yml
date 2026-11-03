@@ -34,12 +34,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
         run: |
-          $tag = "v1.6.0"
+          $tag = "v1.7.0"
           gh release view $tag --repo "${{ github.repository }}" *> $null
           if ($LASTEXITCODE -eq 0) {
             $files = Get-ChildItem "desktop/dist/*.exe" | ForEach-Object { $_.FullName }
             gh release upload $tag @files --repo "${{ github.repository }}" --clobber
           } else {
             $files = Get-ChildItem "desktop/dist/*.exe" | ForEach-Object { $_.FullName }
-            gh release create $tag @files --repo "${{ github.repository }}" --title "SED Calendar 2026 v1.6.0" --notes "Calendar with note detail windows and Once/All recurring event clearing. Windows desktop edition."
+            gh release create $tag @files --repo "${{ github.repository }}" --title "SED Calendar 2026 v1.7.0" --notes "Calendar with note detail windows and Once/All recurring event clearing. Windows desktop edition."
           }
