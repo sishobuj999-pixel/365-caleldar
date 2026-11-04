@@ -90,10 +90,13 @@ open class AdvancedCalendarWidgetProvider:AppWidgetProvider(){
   val loc=java.util.Locale.getDefault();val month=now.month.getDisplayName(java.time.format.TextStyle.FULL,loc).uppercase(loc);val wd=now.dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL,loc);val week=now.get(java.time.temporal.WeekFields.of(loc).weekOfWeekBasedYear());val yd=now.toLocalDate().lengthOfYear()
   ids.forEach{id->val v=RemoteViews(context.packageName,R.layout.calendar_widget_multi)
    v.setInt(R.id.widget_root,"setBackgroundResource",bgs[style%4]);v.setTextViewText(R.id.widget_days,days.toString().padStart(2,'0'));v.setChronometer(R.id.widget_timer,android.os.SystemClock.elapsedRealtime()+rem,"%s",true);v.setChronometerCountDown(R.id.widget_timer,true)
-   v.setTextViewText(R.id.widget_year,now.year.toString());v.setTextViewText(R.id.widget_percent,"$pct%");v.setProgressBar(R.id.widget_progress,100,pct,false);v.setTextViewText(R.id.widget_dayofyear,"Day ${now.dayOfYear} of $yd");v.setTextViewText(R.id.widget_passed,"${now.dayOfYear-1} days passed");v.setTextViewText(R.id.widget_remaining,"$days days until New Year");v.setTextViewText(R.id.widget_daynum,now.dayOfMonth.toString());v.setTextViewText(R.id.widget_month,month);v.setTextViewText(R.id.widget_week,"WEEK $week · $wd".uppercase(loc))
-   val clock=style in listOf(0,1,4,5,6,7,8,9,11);val date=style in listOf(1,4,5,6,7,8,9,11);val count=style in listOf(3,6,8,9);val progress=style in listOf(2,7,9,10,11);val stats=style in listOf(7,9,10);val tile=style==4;val weekInfo=style==5||style==9
-   show(v,R.id.widget_header,clock);show(v,R.id.widget_clock,clock);show(v,R.id.widget_year,style in listOf(1,7,9));show(v,R.id.widget_date,date);show(v,R.id.widget_countdown_row,count);show(v,R.id.widget_progress_row,progress);show(v,R.id.widget_dayofyear,weekInfo||style in listOf(2,10,11));show(v,R.id.widget_passed,stats);show(v,R.id.widget_remaining,stats||style in listOf(3,6,8));show(v,R.id.widget_daynum,tile);show(v,R.id.widget_month,tile);show(v,R.id.widget_week,weekInfo)
-   if(style==0)v.setTextViewTextSize(R.id.widget_clock,android.util.TypedValue.COMPLEX_UNIT_SP,27f);if(style==8)v.setTextViewTextSize(R.id.widget_days,android.util.TypedValue.COMPLEX_UNIT_SP,42f)
+   v.setTextViewText(R.id.widget_year,now.year.toString())
+   val accent=android.graphics.Color.parseColor(arrayOf("#FFFFFFFF","#FFB9E6FF","#FFFFD59E","#FFC7FFD8","#FFE2C6FF","#FFFFC4D0","#FFB8FFF4","#FFFFF0A8","#FFD6E0FF","#FFFFD7B5")[style%10])
+   v.setTextColor(R.id.widget_days,accent);v.setTextColor(R.id.widget_percent,accent);v.setTextColor(R.id.widget_year,accent);v.setTextViewText(R.id.widget_percent,"$pct%");v.setProgressBar(R.id.widget_progress,100,pct,false);v.setTextViewText(R.id.widget_dayofyear,"Day ${now.dayOfYear} of $yd");v.setTextViewText(R.id.widget_passed,"${now.dayOfYear-1} days passed");v.setTextViewText(R.id.widget_remaining,"$days days until New Year");v.setTextViewText(R.id.widget_daynum,now.dayOfMonth.toString());v.setTextViewText(R.id.widget_month,month);v.setTextViewText(R.id.widget_week,"WEEK $week · $wd".uppercase(loc))
+   val variant=style%12
+   val clock=variant in listOf(0,1,4,5,6,7,8,9,11);val date=variant in listOf(1,4,5,6,7,8,9,11);val count=variant in listOf(3,6,8,9);val progress=variant in listOf(2,7,9,10,11);val stats=variant in listOf(7,9,10);val tile=variant==4;val weekInfo=variant==5||variant==9
+   show(v,R.id.widget_header,clock);show(v,R.id.widget_clock,clock);show(v,R.id.widget_year,variant in listOf(1,7,9));show(v,R.id.widget_date,date);show(v,R.id.widget_countdown_row,count);show(v,R.id.widget_progress_row,progress);show(v,R.id.widget_dayofyear,weekInfo||variant in listOf(2,10,11));show(v,R.id.widget_passed,stats);show(v,R.id.widget_remaining,stats||variant in listOf(3,6,8));show(v,R.id.widget_daynum,tile);show(v,R.id.widget_month,tile);show(v,R.id.widget_week,weekInfo)
+   if(variant==0)v.setTextViewTextSize(R.id.widget_clock,android.util.TypedValue.COMPLEX_UNIT_SP,27f);if(variant==8)v.setTextViewTextSize(R.id.widget_days,android.util.TypedValue.COMPLEX_UNIT_SP,42f)
    val weather=runCatching{org.json.JSONObject(context.getSharedPreferences("sed_weather",Context.MODE_PRIVATE).getString("weather_json","{}")?: "{}")}.getOrNull()
    val temp=weather?.optDouble("temperature",Double.NaN)?:Double.NaN
    val description=weather?.optString("description","Weather")?:"Weather"
@@ -143,3 +146,42 @@ class YearStatisticsWidgetProvider:AdvancedCalendarWidgetProvider(){override val
 class MinimalProgressWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=10}
 
 class DualInfoWidgetProvider:AdvancedCalendarWidgetProvider(){override val style=11}
+
+class SEDWidget13Provider:AdvancedCalendarWidgetProvider(){override val style=12}
+class SEDWidget14Provider:AdvancedCalendarWidgetProvider(){override val style=13}
+class SEDWidget15Provider:AdvancedCalendarWidgetProvider(){override val style=14}
+class SEDWidget16Provider:AdvancedCalendarWidgetProvider(){override val style=15}
+class SEDWidget17Provider:AdvancedCalendarWidgetProvider(){override val style=16}
+class SEDWidget18Provider:AdvancedCalendarWidgetProvider(){override val style=17}
+class SEDWidget19Provider:AdvancedCalendarWidgetProvider(){override val style=18}
+class SEDWidget20Provider:AdvancedCalendarWidgetProvider(){override val style=19}
+class SEDWidget21Provider:AdvancedCalendarWidgetProvider(){override val style=20}
+class SEDWidget22Provider:AdvancedCalendarWidgetProvider(){override val style=21}
+class SEDWidget23Provider:AdvancedCalendarWidgetProvider(){override val style=22}
+class SEDWidget24Provider:AdvancedCalendarWidgetProvider(){override val style=23}
+class SEDWidget25Provider:AdvancedCalendarWidgetProvider(){override val style=24}
+class SEDWidget26Provider:AdvancedCalendarWidgetProvider(){override val style=25}
+class SEDWidget27Provider:AdvancedCalendarWidgetProvider(){override val style=26}
+class SEDWidget28Provider:AdvancedCalendarWidgetProvider(){override val style=27}
+class SEDWidget29Provider:AdvancedCalendarWidgetProvider(){override val style=28}
+class SEDWidget30Provider:AdvancedCalendarWidgetProvider(){override val style=29}
+class SEDWidget31Provider:AdvancedCalendarWidgetProvider(){override val style=30}
+class SEDWidget32Provider:AdvancedCalendarWidgetProvider(){override val style=31}
+class SEDWidget33Provider:AdvancedCalendarWidgetProvider(){override val style=32}
+class SEDWidget34Provider:AdvancedCalendarWidgetProvider(){override val style=33}
+class SEDWidget35Provider:AdvancedCalendarWidgetProvider(){override val style=34}
+class SEDWidget36Provider:AdvancedCalendarWidgetProvider(){override val style=35}
+class SEDWidget37Provider:AdvancedCalendarWidgetProvider(){override val style=36}
+class SEDWidget38Provider:AdvancedCalendarWidgetProvider(){override val style=37}
+class SEDWidget39Provider:AdvancedCalendarWidgetProvider(){override val style=38}
+class SEDWidget40Provider:AdvancedCalendarWidgetProvider(){override val style=39}
+class SEDWidget41Provider:AdvancedCalendarWidgetProvider(){override val style=40}
+class SEDWidget42Provider:AdvancedCalendarWidgetProvider(){override val style=41}
+class SEDWidget43Provider:AdvancedCalendarWidgetProvider(){override val style=42}
+class SEDWidget44Provider:AdvancedCalendarWidgetProvider(){override val style=43}
+class SEDWidget45Provider:AdvancedCalendarWidgetProvider(){override val style=44}
+class SEDWidget46Provider:AdvancedCalendarWidgetProvider(){override val style=45}
+class SEDWidget47Provider:AdvancedCalendarWidgetProvider(){override val style=46}
+class SEDWidget48Provider:AdvancedCalendarWidgetProvider(){override val style=47}
+class SEDWidget49Provider:AdvancedCalendarWidgetProvider(){override val style=48}
+class SEDWidget50Provider:AdvancedCalendarWidgetProvider(){override val style=49}
